@@ -1,13 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        {% block stylesheets %}{% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+	<head>
+	{% block head %}
+		<title>{% block head_title %}Que comemos hoy?{% endblock %}</title>
+	
+		{% block head_css %}
+	    	<style type="text/css">
+	    		#cssmenu span {
+					display: block;
+					color: #666666;
+					line-height: 160%;
+					padding: 10px 28px 10px 28px;
+				}
+				#container{
+					padding: 10px;
+					min-width: 780px;
+					min-height: 200px;
+					margin: 0px auto;
+				}
+				#user_info{
+					text-align: right;
+					padding: 0px 5px 5px 0px;
+				}
+				
+				<base href="{{ baseURL | default("") }}" />
+				.form-group {
+					margin-bottom: 7px !important;
+				}
+				div.solapas_bold{
+					margin-bottom: 15px !important;
+				}
+				.alert{
+					width: 90% !important;
+					margin: 1px auto 7px auto;
+					display:none;
+				}
+				td.group {
+					background-color: #D1CFD0 !important;
+					border-bottom: 2px solid #A19B9E !important;
+					border-top: 2px solid #A19B9E !important;
+					line-height: 10px !important;
+					text-align: left;
+				}
+				#container{
+					max-width: 90% !important;
+				}
+	    	</style>
+	    	
+	    	<link href="{{  asset("bundles/app/css/bootstrap.css")}}" rel="stylesheet" type="text/css" />
+	    {% endblock %}
+	      
+    {% endblock head %}
     </head>
+
     <body>
-        {% block body %}{% endblock %}
-        {% block javascripts %}{% endblock %}
+      {%block body%}
+        {%block body_container%}
+          <div id="container">
+            <header>
+        		{% block body_container_header %}
+					<div id="header">
+						<div class="wrapper">
+{# 							<div id="logo"><img src="{{ asset('bundles/app/img/header.jpg')}}"></div>#}
+						</div>
+					</div>
+					{% block user_info %}
+						{% if app.user %}
+		              		<div id="user_info">{{ app.user.username }} | <a href="{{ path("logout") }}">Salir</a></div>
+		              	{% endif %}	
+	              	{% endblock %}
+		              {% block menu %}
+			            <div id="cssmenu">
+		              		{#{{ knp_menu_render('SURSecurityBundle:Builder:mainMenu') }}#}
+						</div>
+		              {% endblock %}
+					
+					{% block blockTitulo %}
+					<div class="well" style="width: 100%;">
+						<div class="row">
+							<div class="col-sm-6" style="text-align: left;">
+						  		{{ title|default("") }}
+						  	</div>
+							<div class="col-sm-6" style="text-align: right;">
+								<a href="javascript:history.back()"><img  width="32" height="32" src="{{ asset('bundles/app/img/backIcon.png') }}"></a>
+								<a href="{{ path('homepage') }}"><img  width="32" height="32" src="{{ asset('bundles/app/img/homeIcon.png') }}"></a>
+							</div>
+						</div>
+					</div>
+					{% endblock %}
+					
+					{% block console_errors %}
+						<!-- Consola de Errores -->
+						<div class="alert alert-danger" id="errores">
+					    	<ul>{% for flashMessage in app.session.flashbag.get('error') %}<li>{{ flashMessage }}</li>{% endfor %}
+					        </ul>
+					    </div>
+					{% endblock %}
+
+					{% block console_notice %}
+					    <!-- Consola de Mensaje de Guardado Exitoso -->
+						<div id="msg">
+						{% if notices is defined and notices|length %}
+					    	<ul>
+								{% for flashMessage in notices %}
+					        		<li>{{ flashMessage }}</li>
+								{% endfor %}
+					        </ul>
+						{% endif %}
+					    </div>
+					{% endblock %}
+				
+					{% block loading %}
+						<div id="loading" class="modal">
+						</div>
+					{% endblock %}
+				{% endblock body_container_header %}
+            </header>
+            <div role="main">
+              {% block body_container_main %}{% endblock %}
+            </div>
+            <footer>
+              {% block body_container_footer %}
+			    <div id="footer">
+					<div class="wrapper" >
+						<div id="footer_logo" class="contenedor">
+			{# 				<img src="{{ asset('bundles/sti/images/footer1.png') }}" class="izq">#}
+							<div class="central"></div>
+			{# 				<img src="{{ asset('bundles/sti/images/footer3.png') }}" class="der">#}
+						</div>
+					</div>
+				</div>
+              {% endblock %}
+            </footer>
+          </div>
+        {%endblock body_container%}
+        
+        {% block body_js %}
+        	<script type="text/javascript" src="{{  asset("bundles/app/js/jquery-2.1.4.js")}}"></script>
+        	
+        	<script type="text/javascript">
+        	
+				$(document).ready(function() {
+					if ($("#errores ul li").length > 0){
+						$("#errores").show();
+					}
+				});
+				
+			</script>
+        {% endblock body_js %}
+        
+      {% endblock body %}
     </body>
 </html>
