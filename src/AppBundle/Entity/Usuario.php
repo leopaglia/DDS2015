@@ -106,7 +106,13 @@ class Usuario implements UserInterface, \Serializable
     private $rutina;
     
     
-
+	public function __construct($dni, $user, $pass, $sexo, $edad){
+		$this->username = $user;
+		$this->dni = $dni;
+		$this->password = md5($pass);
+		$this->sexo = $sexo;
+		$this->edad = $edad;
+	}
 
 
     /**

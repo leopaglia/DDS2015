@@ -1,9 +1,14 @@
 {% extends "base.html.twig" %}
 
-{% block body_container_main %}
-
-	<div class="panel panel-default">
-	  <div class="panel-heading"><h3 class="panel-title">Login</h3></div>
+{% block buttons %}
+  	{% if app.user is null or app.user is empty%}
+  		<button id="loginButton" class="btn btn-primary btn-lg"> Ingresar </button>
+  		<button id="signupButton" class="btn btn-primary btn-lg"> Registrarse </button>
+  	{% endif %}
+{% endblock buttons %}
+  				
+{% block dialog1 %}
+	<div id="loginDialog" title="Ingresar" class="panel panel-default" style="padding: 10px; margin-bottom: 10px;">
 
 	    <div class="panel-body">
 	    	
@@ -20,7 +25,7 @@
 					    <input type="password" class="form-control" placeholder="Ingrese password" id="password" name="_password" />
 					</div>
 					
-				    <button type="submit" class="btn btn-default">Login</button>
+				    <button type="submit" class="btn btn-default">Ingresar</button>
 				    
 				</form>
 			</div>
@@ -28,6 +33,112 @@
 	    </div>
 	    
 	</div>	    
-	
-{% endblock body_container_main%}	
+{% endblock dialog1%}	
 
+{% block dialog2 %}
+	<div id="signupDialog" title="Registrarse" class="panel panel-default" style="padding: 10px; margin-bottom: 10px;">
+
+	    <div class="panel-body">
+	    	
+	    	<div class="form-group">
+				<form action="{{ path('signup') }}" method="post">
+				
+					<div class="form-group">
+					    <label for="username">Usuario:</label>
+					    <input type="text" class="form-control" id="username" name="_username" placeholder="Ingrese usuario" value="{{ last_username }}" />
+					</div>
+					
+					<div class="form-group">
+					    <label for="dni">DNI:</label>
+					    <input type="text" class="form-control" id="dni" name="_dni" placeholder="Ingrese DNI "/>
+					</div>
+					
+					<div class="form-group">
+					    <label for="sexo">Sexo:</label>
+					    <select id="sexo" name="_sexo" class="form-control">
+					  	   <option value="M">Masculino</option>
+						   <option value="F">Femenino</option>
+						</select>   
+					</div>
+					
+					<div class="form-group">
+					    <label for="edad">Edad:</label>
+					    <input type="text" class="form-control" id="edad" name="_edad" placeholder="Ingrese edad"/>
+					</div>
+					
+					<div class="form-group">
+					    <label for="password">Password:</label>
+					    <input type="password" class="form-control" placeholder="Ingrese password" id="password" name="_password" />
+					</div>
+					
+					<div class="form-group">
+					    <label for="password">Repita Password:</label>
+					    <input type="password" class="form-control" placeholder="Repita password" id="password2" name="_password2" />
+					</div>
+					
+				    <button type="submit" class="btn btn-default">Registrarse</button>
+				    
+				</form>
+			</div>
+			
+	    </div>
+	    
+	</div>	    
+{% endblock dialog2 %}	
+
+
+{% block body_js %}
+
+	{{ parent() }}
+	
+	<script type="text/javascript">
+	
+		$("#loginDialog").dialog({
+			
+			 autoOpen: false,
+			 draggable: false,
+			 resizable: false,
+			 width: 500,
+			 
+			 show: {
+				 effect: "clip",
+				 duration: 500,
+			 },
+			 
+			 hide: {
+				 effect: "clip",
+				 duration: 500
+			 }
+		 });
+		 
+		$("#signupDialog").dialog({
+			
+			 autoOpen: false,
+			 draggable: false,
+			 resizable: false,
+			 width: 500,
+			 
+			 show: {
+				 effect: "clip",
+				 duration: 500,
+			 },
+			 
+			 hide: {
+				 effect: "clip",
+				 duration: 500
+			 }
+		 });
+
+		 $("#loginButton").click(function() {
+			$('#signupDialog').dialog('close');
+		 	$('#loginDialog').dialog('open');
+		 });
+		 
+		 $("#signupButton").click(function() {
+			$('#loginDialog').dialog('close');
+		 	$('#signupDialog').dialog('open');
+		 });
+				 				 
+	</script>
+
+{% endblock body_js %}

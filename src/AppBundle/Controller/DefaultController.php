@@ -16,12 +16,8 @@ class DefaultController extends Controller
 	 * @Security("has_role('ROLE_USER')")
      * @Route("/", name="homepage")
      */
-    public function indexAction()
-    {
-//     	$session = $this->getRequest()->getSession();
-//     	$session->set("ID_USER", $this->getUser()->getDni());
-//     	$session->getFlashBag()->add('error', 'Profile updated');
-    	
-        return $this->render('default/index.html.twig');
+    public function indexAction(){
+
+    	return $this->render('default/index.html.twig', array("title" => "DDS 2015"));
     }    
 }
