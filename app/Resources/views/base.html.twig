@@ -27,7 +27,16 @@
 					</div>
 					{% block user_info %}
 						{% if app.user %}
-		              		<div id="user_info"><h4>{{ app.user.username }} | <a href="{{ path("logout") }}">Salir</a></h4></div>
+	 		              	<div>
+								<ul id="user_info">
+								    <li><a href="#">{{ app.user.username }}</a>
+								       <ul>
+								        <li><a href="{{ path("profile") }}">Mi Perfil</a></li>
+								        <li><a href="{{ path("logout") }}">Cerrar Sesi&oacuten</a></li>
+								       </ul>
+								    </li>
+								</ul>
+							</div>	
 		              	{% endif %}	
 	              	{% endblock %}
 					
@@ -64,7 +73,7 @@
 
 					{% block console_notice %}
 					    <!-- Consola de Mensaje de Alerta -->
-						<div id="msg">
+						<div class="alert alert-danger" id="notices">
 					    	<ul>{% for flashMessage in app.session.flashbag.get('notice') %}<li>{{ flashMessage }}</li>{% endfor %}</ul>
 					    </div>
 					{% endblock %}
@@ -109,6 +118,12 @@
 						if ($("#errores ul li").length > 0){
 							$("#errores").show();
 						}
+
+						if ($("#notices ul li").length > 0){
+							$("#notices").show();
+						}
+
+						$("#user_info").menu({ position: { my: "right top", at: "right-1 top+35" } });
 				});
 				
 			</script>

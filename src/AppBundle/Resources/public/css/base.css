@@ -1,0 +1,46 @@
+@CHARSET "ISO-8859-1";
+
+#cssmenu span {
+	display: block;
+	color: #666666;
+	line-height: 160%;
+	padding: 10px 28px 10px 28px;
+}
+#container{
+	padding: 10px;
+	min-width: 780px;
+	min-height: 200px;
+	margin: 0px auto;
+}
+#user_info{
+	float: right;
+	padding: 0px 20px 0px 0px;
+	min-width: 230px !important;
+}
+
+/* .ui-menu-item{ */
+/* 	max-width: 15%; */
+/* } */
+
+<base href="{{ baseURL | default("") }}" />
+.form-group {
+	margin-bottom: 7px !important;
+}
+div.solapas_bold{
+	margin-bottom: 15px !important;
+}
+.alert{
+	width: 90% !important;
+	margin: 1px auto 7px auto;
+	display:none;
+}
+td.group {
+	background-color: #D1CFD0 !important;
+	border-bottom: 2px solid #A19B9E !important;
+	border-top: 2px solid #A19B9E !important;
+	line-height: 10px !important;
+	text-align: left;
+}
+#container{
+	max-width: 90% !important;
+}

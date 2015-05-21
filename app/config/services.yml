@@ -1,0 +1,7 @@
+#services:
+#  App.security.authentication_failure_event_listener:
+#      class: AppBundle\Controller\SecurityController
+#      tags:
+#          - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure }
+#
+#          

@@ -52,16 +52,14 @@ class SecurityController extends Controller
     	$session = $request->getSession();
     	$session->getFlashBag()->add('notice', 'Usuario creado con exito.');
     	
-    	return $this->loginAction();
-    	//return $this->render('security/login.html.twig', array('last_username' => $user, 'error' => "Usuario creado correctamente.",  "title" => "DDS 2015"));
-    
+    	return new RedirectResponse($this->generateUrl("homepage"));
     }
     
-    public function onAuthenticationFailure(AuthenticationFailureEvent $exception){
+//     public function onAuthenticationFailure(AuthenticationFailureEvent $exception){
     	
-    	//return new RedirectResponse($this->generateUrl('login'));
-		throw new WrongLoginException("Usuario o contraseña incorrectos."); //una verga, cambiar esto
-    }	
+//     	//return new RedirectResponse($this->generateUrl('login'));
+// 		throw new WrongLoginException("Usuario o contraseña incorrectos."); //una verga, cambiar esto
+//     }	
     	
     // these controllers will not be executed,
     // as the route is handled by the Security system
