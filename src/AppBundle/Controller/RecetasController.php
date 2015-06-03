@@ -1,4 +1,5 @@
 <?php
+
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -9,13 +10,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 
 use AppBundle\Entity\Usuario;
+use AppBundle\Entity\CondicionesDeSalud;
+use AppBundle\Entity\Rutina;
 
-class BasicController extends Controller{
-	
-	protected function renderBasicForm($fieldsets, $buttons, $config, $title){
-		
-		return $this->render('Basic/basicForm.html.twig', array("fieldsets" => $fieldsets, "buttons" => $buttons, "config" => $config, "title" => $title));
-	}
-	
-	
+class RecetasController extends BasicController{
+
+	/**
+     * @Route("/seleccionarRecetas", name="seleccionarRecetas")
+     */
+    public function seleccionarRecetasAction(){
+    	
+	    return $this->render('Default/seleccionarRecetas.html.twig', array("title" => "Seleccionar Recetas"));
+    }
+    
+    
+
 }

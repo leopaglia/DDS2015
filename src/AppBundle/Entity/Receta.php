@@ -225,12 +225,12 @@ class Receta
     }
 
     /**
-     * Add condimento
+     * Add idcondimento
      *
      * @param \AppBundle\Entity\Condimento $idcondimento
      * @return Receta
      */
-    public function addCondimento(\AppBundle\Entity\Condimento $idcondimento)
+    public function addIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
     {
         $this->idcondimento[] = $idcondimento;
 
@@ -238,32 +238,32 @@ class Receta
     }
 
     /**
-     * Remove condimento
+     * Remove idcondimento
      *
      * @param \AppBundle\Entity\Condimento $idcondimento
      */
-    public function removeCondimento(\AppBundle\Entity\Condimento $idcondimento)
+    public function removeIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
     {
         $this->idcondimento->removeElement($idcondimento);
     }
 
     /**
-     * Get condimento
+     * Get idcondimento
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getCondimentos()
+    public function getIdcondimento()
     {
         return $this->idcondimento;
     }
 
     /**
-     * Add ingrediente
+     * Add idingrediente
      *
      * @param \AppBundle\Entity\Ingrediente $idingrediente
      * @return Receta
      */
-    public function addIngrediente(\AppBundle\Entity\Ingrediente $idingrediente)
+    public function addIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
     {
         $this->idingrediente[] = $idingrediente;
 
@@ -271,21 +271,21 @@ class Receta
     }
 
     /**
-     * Remove ingrediente
+     * Remove idingrediente
      *
      * @param \AppBundle\Entity\Ingrediente $idingrediente
      */
-    public function removeIngrediente(\AppBundle\Entity\Ingrediente $idingrediente)
+    public function removeIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
     {
         $this->idingrediente->removeElement($idingrediente);
     }
 
     /**
-     * Get ingrediente
+     * Get idingrediente
      *
      * @return \Doctrine\Common\Collections\Collection 
      */
-    public function getIngredientes()
+    public function getIdingrediente()
     {
         return $this->idingrediente;
     }

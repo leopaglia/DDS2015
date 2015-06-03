@@ -28,6 +28,28 @@ class CondicionesDeSalud
      */
     private $nombre;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idcondiciones")
+     * @ORM\JoinTable(name="condiciones_usuario",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="idCondiciones", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="dni")
+     *   }
+     * )
+     */
+    private $idusuario;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->idusuario = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
 
     /**
@@ -61,5 +83,38 @@ class CondicionesDeSalud
     public function getNombre()
     {
         return $this->nombre;
+    }
+
+    /**
+     * Add idusuario
+     *
+     * @param \AppBundle\Entity\Usuario $idusuario
+     * @return CondicionesDeSalud
+     */
+    public function addIdusuario(\AppBundle\Entity\Usuario $idusuario)
+    {
+        $this->idusuario[] = $idusuario;
+
+        return $this;
+    }
+
+    /**
+     * Remove idusuario
+     *
+     * @param \AppBundle\Entity\Usuario $idusuario
+     */
+    public function removeIdusuario(\AppBundle\Entity\Usuario $idusuario)
+    {
+        $this->idusuario->removeElement($idusuario);
+    }
+
+    /**
+     * Get idusuario
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdusuario()
+    {
+        return $this->idusuario;
     }
 }

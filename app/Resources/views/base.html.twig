@@ -5,10 +5,12 @@
 		<title>{% block head_title %}Que comemos hoy?{% endblock %}</title>
 	
 		{% block head_css %}
-
 	    	<link href="{{  asset("bundles/app/css/base.css")}}" rel="stylesheet" type="text/css" />
 	    	<link href="{{  asset("bundles/app/css/core/bootstrap.css")}}" rel="stylesheet" type="text/css" />
 	    	<link href="{{  asset("bundles/app/css/core/jquery-ui.css")}}" rel="stylesheet" type="text/css" />
+	    	<link href="{{  asset("bundles/app/css/core/jquery.multiselect.css")}}" rel="stylesheet" type="text/css" />
+	    	<link href="{{  asset("bundles/app/css/core/jquery.multiselect.filter.css")}}" rel="stylesheet" type="text/css" />
+	    	<link href="{{  asset("bundles/app/css/core/multi-select.css")}}" rel="stylesheet" type="text/css" />
 	    {% endblock %}
 	      
     {% endblock head %}
@@ -108,10 +110,14 @@
           	
         {%endblock body_container%}
         
+        {% block body_js %}
+        
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-2.1.4.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-ui.js")}}"></script>
+        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.js")}}"></script>
+        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.filter.js")}}"></script>
+        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multi-select.js")}}"></script>
         	
-        {% block body_js %}
         	<script type="text/javascript">
 
 			$(document).ready(function() {

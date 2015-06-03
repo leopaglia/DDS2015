@@ -14,6 +14,28 @@
 		.boton{
 			margin-left: 85% ;
 		}
+		
+		.inline{
+			display: inline-block;
+		}
+		
+		.dragContainer{
+			width: 150px; 
+			height: 150px; 
+			padding: 0.5em; 
+			float: left; 
+			margin: 10px;
+			border: 1px solid;
+		}
+		
+		.dropContainer{
+			width: 150px; 
+			height: 150px; 
+			padding: 0.5em; 
+			float: right; 
+			margin: 10px;
+			border: 1px solid;
+		}
 
 	</style>
 {% endblock %}
@@ -22,38 +44,78 @@
 
 	<div id="basicFormPanel" class="panel panel-default form-group">
  		
-		<form action="{{ path(options.routename) }}"method="post">
+		<form action="{{ path(config.routename) }}"method="post">
+	 	
+	 		<div class="panel-heading well"> <b>Modificar perfil</b> </div>
 	 	
 	 		<div class="panel-body">
 		
-				{% for field in fields %}
-					
-					{% if field.type == "input" %}
-						<div class="form-group">
-						    <label for="{{ field.idName }}">{{ field.label }}</label>
-						    <input type="text" class="form-control" id="{{ field.idName }}" name="{{ field.idName }}" placeholder="{{ field.placeholder }}"/>
-						</div>
-					{% endif %}
-					
-					{% if field.type == "select" %}
-						<div class="form-group">
-						    <label for="{{ field.idName }}">{{ field.label }}:</label>
-						    <select id="{{ field.idName }}" name="{{ field.idName }}" class="form-control">
-						    	{% for option in field.options %}
-						  	   		<option value="{{ option.value }}">{{ option.name }}</option>
-							   {% endfor %}
-							</select>   
-						</div>
-					{% endif %}
-					
-			    {% endfor %}
-		    
+			{% if config.display == "accordion" %}
+				<div id="accordion">
+			
+				{% for set in fieldsets %}
+					<h3>{{ set.title }}</h3>
+					<div>
+						{% for field in set.fields %}
+							
+							{% if field.type == "input" %}
+								<div class="form-group">
+								    <label for="{{ field.idName }}">{{ field.label }}</label>
+								    <input type="text" class="form-control" id="{{ field.idName }}" name="{{ field.idName }}" placeholder="{{ field.placeholder }}"/>
+								</div>
+							{% endif %}
+							
+							{% if field.type == "select" %}
+								<div class="form-group">
+								    <label for="{{ field.idName }}">{{ field.label }}:</label>
+								    <select id="{{ field.idName }}" name="{{ field.idName }}" class="form-control">
+								    	{% for option in field.options %}
+								  	   		<option value="{{ option.value }}">{{ option.name }}</option>
+									   {% endfor %}
+									</select>   
+								</div>
+							{% endif %}
+							
+							{% if field.type == "multiselect" %}
+								<div class="form-group">
+								    <label for="{{ field.idName }}">{{ field.label }}:</label>
+								    <select multiple="multiple" id="{{ field.idName }}" name="{{ field.idName }}" class="form-control multiselect">
+								    	{% for option in field.options %}
+								  	   		<option value="{{ option.value }}">{{ option.name }}</option>
+									   {% endfor %}
+									</select>   
+								</div>
+							{% endif %}
+							
+							{% if field.type == "draganddrop" %} <!-- FIXME -->
+								
+								<div class="well inline dragContainer">
+									<div class="">
+										{% for item in field.draggables %}
+											<div id="{{ item.id }}" class="draggable btn-default">{{ item.text }}</div>
+										{% endfor %}
+									</div>
+								</div>
+									
+								<div class="well inline dropContainer">
+									<p>drop zone</p>
+								</div>
+							
+							{% endif %}
+							
+					    {% endfor %}
+					 </div>
+					    
+				 {% endfor %}  
+		   		</div>
+		   	{% endif %}
+		   		
 		    </div>
 		    
 			<div class="panel-footer">
 			
 			    {% for button in buttons %}
- 					    <button type="{{ button.type }}" class="boton btn btn-default">{{ button.text }}</button>
+	 				<button type="{{ button.type }}" class="boton btn btn-default">{{ button.text }}</button>
 			    {% endfor %}
 			    
 			</div>
@@ -63,3 +125,43 @@
 	 </div>   
 
 {% endblock body_container_main %}
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+
+			$("#accordion").accordion({
+				header: "h3",
+				collapsible: true,
+				active: false,
+				
+			});
+
+			$(".multiselect").multiSelect();
+			$('.multiselect').multiSelect('deselect_all');
+
+			
+			$(".draggable").draggable({
+				appendTo: "parent",
+				revert: "invalid",
+			}); 
+			
+		    $(".dropContainer").droppable({
+		        drop: function( event, ui ) {
+		        }
+		    });
+		    
+		    $(".dragContainer").droppable({
+		        drop: function( event, ui ) {
+		        }
+		    });
+			
+		});
+			
+	</script>
+
+{% endblock body_js %}

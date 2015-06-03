@@ -227,7 +227,28 @@ CREATE TABLE IF NOT EXISTS `dds2015`.`usuario` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = latin1;
 
+CREATE TABLE `dds2015`.`condiciones_usuario` (
+  `idCondiciones` INT NOT NULL,
+  `idUsuario` INT NOT NULL,
+  PRIMARY KEY (`idCondiciones`, `idUsuario`),
+  INDEX `FK_Usuario_idx` (`idUsuario` ASC),
+  CONSTRAINT `FK_Usuario`
+    FOREIGN KEY (`idUsuario`)
+    REFERENCES `dds2015`.`usuario` (`dni`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `FK_Condicion`
+    FOREIGN KEY (`idCondiciones`)
+    REFERENCES `dds2015`.`condiciones_de_salud` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ALTER TABLE `dds2015`.`usuario` 
+DROP FOREIGN KEY `condicionSaludFK`;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
+

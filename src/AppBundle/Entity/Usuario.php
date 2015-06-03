@@ -13,17 +13,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class Usuario implements UserInterface, \Serializable
 {
-	
-	/**
-	 * @ORM\Column(name="password", type="string", length=64)
-	 */
-	private $password;
-	
     /**
      * @var integer
      *
      * @ORM\Column(name="dni", type="integer")
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
     private $dni;
 
@@ -56,6 +51,20 @@ class Usuario implements UserInterface, \Serializable
     private $altura;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="condicion", type="integer", nullable=true)
+     */
+    private $condicion;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="password", type="string", length=64, nullable=false)
+     */
+    private $password;
+
+    /**
      * @var \AppBundle\Entity\Complexion
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Complexion")
@@ -64,16 +73,6 @@ class Usuario implements UserInterface, \Serializable
      * })
      */
     private $complexion;
-
-    /**
-     * @var \AppBundle\Entity\CondicionesDeSalud
-     *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\CondicionesDeSalud")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="condicion", referencedColumnName="id")
-     * })
-     */
-    private $condicion;
 
     /**
      * @var \AppBundle\Entity\Dieta
@@ -104,16 +103,27 @@ class Usuario implements UserInterface, \Serializable
      * })
      */
     private $rutina;
-    
-    
-	public function __construct($dni, $user, $pass, $sexo, $edad){
-		$this->username = $user;
-		$this->dni = $dni;
-		$this->password = md5($pass);
-		$this->sexo = $sexo;
-		$this->edad = $edad;
-	}
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\CondicionesDeSalud", mappedBy="idusuario")
+     */
+    private $idcondiciones;
+
+    /**
+     * Constructor
+     */
+    public function __construct($dni, $user, $pass, $sexo, $edad){
+    	
+    	$this->idcondiciones = new \Doctrine\Common\Collections\ArrayCollection();
+    	
+    	$this->username = $user;
+    	$this->dni = $dni;
+    	$this->password = md5($pass);
+    	$this->sexo = $sexo;
+    	$this->edad = $edad;
+    }
 
     /**
      * Get dni
@@ -137,6 +147,7 @@ class Usuario implements UserInterface, \Serializable
 
         return $this;
     }
+
 
     /**
      * Set sexo
@@ -208,6 +219,43 @@ class Usuario implements UserInterface, \Serializable
     }
 
     /**
+     * Set condicion
+     *
+     * @param integer $condicion
+     * @return Usuario
+     */
+    public function setCondicion($condicion)
+    {
+        $this->condicion = $condicion;
+
+        return $this;
+    }
+
+    /**
+     * Get condicion
+     *
+     * @return integer 
+     */
+    public function getCondicion()
+    {
+        return $this->condicion;
+    }
+
+    /**
+     * Set password
+     *
+     * @param string $password
+     * @return Usuario
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+
+    /**
      * Set complexion
      *
      * @param \AppBundle\Entity\Complexion $complexion
@@ -228,29 +276,6 @@ class Usuario implements UserInterface, \Serializable
     public function getComplexion()
     {
         return $this->complexion;
-    }
-
-    /**
-     * Set condicion
-     *
-     * @param \AppBundle\Entity\CondicionesDeSalud $condicion
-     * @return Usuario
-     */
-    public function setCondicion(\AppBundle\Entity\CondicionesDeSalud $condicion = null)
-    {
-        $this->condicion = $condicion;
-
-        return $this;
-    }
-
-    /**
-     * Get condicion
-     *
-     * @return \AppBundle\Entity\CondicionesDeSalud 
-     */
-    public function getCondicion()
-    {
-        return $this->condicion;
     }
 
     /**
@@ -321,11 +346,45 @@ class Usuario implements UserInterface, \Serializable
     {
         return $this->rutina;
     }
-    
-    
-    
-    //INTERFACE METHODS
 
+    /**
+     * Add idcondiciones
+     *
+     * @param \AppBundle\Entity\CondicionesDeSalud $idcondiciones
+     * @return Usuario
+     */
+    public function addIdcondicione(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
+    {
+        $this->idcondiciones[] = $idcondiciones;
+
+        return $this;
+    }
+
+    /**
+     * Remove idcondiciones
+     *
+     * @param \AppBundle\Entity\CondicionesDeSalud $idcondiciones
+     */
+    public function removeIdcondicione(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
+    {
+        $this->idcondiciones->removeElement($idcondiciones);
+    }
+
+    /**
+     * Get idcondiciones
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdcondiciones()
+    {
+        return $this->idcondiciones;
+    }
+    
+    
+
+
+    //INTERFACE METHODS
+    
     public function getUsername()
     {
     	return $this->username;
