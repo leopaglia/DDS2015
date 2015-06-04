@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="AppBundle\Entity\Receta" table="receta">
+    <indexes>
+      <index name="temporadaFK_idx" columns="temporada"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="nombre" type="string" column="nombre" length="45" nullable="true"/>
+    <field name="dificultad" type="integer" column="dificultad" nullable="true"/>
+    <field name="fotos" type="integer" column="fotos" nullable="true"/>
+    <field name="procedimiento" type="string" column="procedimiento" length="45" nullable="true"/>
+    <field name="calificacion" type="integer" column="calificacion" nullable="true"/>
+    <many-to-one field="temporada" target-entity="Temporada">
+      <join-columns>
+        <join-column name="temporada" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-many field="idingrediente" target-entity="Ingrediente" inversed-by="idreceta">
+      <join-table name="ingrediente_receta">
+        <join-columns>
+          <join-column name="idReceta" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="idIngrediente" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+    <many-to-many field="idcondimento" target-entity="Condimento" inversed-by="idreceta">
+      <join-table name="condimento_receta">
+        <join-columns>
+          <join-column name="idReceta" referenced-column-name="id"/>
+        </join-columns>
+        <inverse-join-columns>
+          <join-column name="idCondimento" referenced-column-name="id"/>
+        </inverse-join-columns>
+      </join-table>
+    </many-to-many>
+  </entity>
+</doctrine-mapping>

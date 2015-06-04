@@ -13,15 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Temporada
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
@@ -35,17 +26,16 @@ class Temporada
      */
     private $eventoSocial;
 
-
-
     /**
-     * Get id
+     * @var integer
      *
-     * @return integer 
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    public function getId()
-    {
-        return $this->id;
-    }
+    private $id;
+
+
 
     /**
      * Set nombre
@@ -91,5 +81,15 @@ class Temporada
     public function getEventoSocial()
     {
         return $this->eventoSocial;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

@@ -5,9 +5,12 @@ namespace AppBundle\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
+
+use Doctrine\ORM\EntityRepository;
 
 use AppBundle\Entity\Usuario;
 use AppBundle\Entity\CondicionesDeSalud;
@@ -16,9 +19,16 @@ use AppBundle\Entity\Rutina;
 class UserController extends BasicController{
 
 	/**
-     * @Route("/perfil", name="profile")
+	 * @Route("/perfil", name="profile")
+	 */
+	public function profileAction(){
+		return $this->render("default/perfil.html.twig");	
+	}
+	
+	/**
+     * @Route("/modificarPerfil", name="modifyProfile")
      */
-    public function profileAction(){
+    public function modifyProfileAction(){
     	
     	//Datos
     	
@@ -82,25 +92,89 @@ class UserController extends BasicController{
      * @Route("/actualizarPerfil", name="updateProfile")
      */
     public function updateProfileAction(Request $request){
-    	//TODO terminar
-//     	$em = $this->getDoctrine()->getManager();
+
+    	$em = $this->getDoctrine()->getManager();
     	
-//     	$dni = $this->getUser();
-//     	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+    	$dni = $this->getUser();
+    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
     	
-//     	$altura = $request->request->get("altura");
-//     	$complexion = $request->request->get("complexion");
-//     	$condicion = $request->request->get("condiciones"); 
+    	$nombre = $request->request->get("nombre");
+    	$apellido = $request->request->get("apellido");
+    	$edad = $request->request->get("edad");
+    	$altura = $request->request->get("altura");
+    	$rutina = $request->request->get("rutina");
+    	$complexion = $request->request->get("complexion");
+    	$condiciones = $request->request->get("condiciones"); 
     	
-//     	$user->setAltura($altura);
-//     	$user->setCondicion($this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicion));
-//     	$user->setComplexion($this->getDoctrine()->getRepository("AppBundle:Complexion")->find($complexion));
+    	$em->beginTransaction();
     	
-//     	$em->persist($user);
-//     	$em->flush();
+    	try{
+    		
+    		if(!empty($nombre))
+    			$user->setNombre($nombre);
+    		if(!empty($apellido))
+	    		$user->setApellido($apellido);
+    		if(!empty($edad))
+	    		$user->setEdad($edad);
+    		if(!empty($altura))
+	    		$user->setAltura($altura);
+    		if(!empty($rutina))
+	    		$user->setRutina($rutina);
+    		if(!empty($complexion))
+	    		$user->setComplexion($this->getDoctrine()->getRepository("AppBundle:Complexion")->find($complexion));
+    		if(!empty($condiciones))
+	    		foreach($condiciones as $condicion)
+		    		$user->addCondicion($this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicion[0]));
+		    	
+	    	$em->persist($user);
+	    	$em->flush();
+    			
+    	}catch(exception $e){
+    		$em->rollback();
+    		throw($e);
+    	}
     	
-    	return new RedirectResponse($this->generateUrl("homepage"));
+    	$em->commit();
     	
+    	return new Response($this->generateUrl("homepage"));
+    	
+    }
+    
+    /**
+     * @Route("/buscarUsuario", name="findUser")
+     */
+    public function buscarUsuarioAction(Request $request){
+    	
+    	$nombre = $request->get("nombre");
+    	
+    	$qb = $this->getEntityManager()->createQueryBuilder();
+
+		$qb->select("u")
+			->from("AppBundle:Usuario", "u");
+    	
+		if(!empty ($nombre) && trim($nombre != "")){
+			$nombre = trim($nombre);
+			$qb->andWhere($qb->expr()->andx($qb->expr()->like('u.username', ':nombre')));
+			$qb->setParameter(':nombre', '%'.$nombre.'%');
+		}
+		
+		$usuario = $qb->getQuery()->Result();
+		$usuario = $usuario[0];
+		
+		$arrayUsuario = array();
+		
+		$arrayUsuario["id"] = $usuario->getId();
+		$arrayUsuario["nombre"] = $usuario->getUsername();
+		
+			
+    	return new JsonResponse($arrayUsuario);
+    }
+
+    /**
+     * @Route("/crearGrupo", name="createGroup")
+     */
+    public function crearGrupoAction(){
+    	//return $this->render("default/perfil.html.twig");
     }
 
 }

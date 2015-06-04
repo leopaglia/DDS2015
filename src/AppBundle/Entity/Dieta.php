@@ -13,6 +13,13 @@ use Doctrine\ORM\Mapping as ORM;
 class Dieta
 {
     /**
+     * @var string
+     *
+     * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
+     */
+    private $nombre;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -21,24 +28,7 @@ class Dieta
      */
     private $id;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
-     */
-    private $nombre;
 
-
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set nombre
@@ -61,5 +51,15 @@ class Dieta
     public function getNombre()
     {
         return $this->nombre;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 }

@@ -13,15 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Receta
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
@@ -50,6 +41,22 @@ class Receta
     private $procedimiento;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="calificacion", type="integer", nullable=true)
+     */
+    private $calificacion;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
      * @var \AppBundle\Entity\Temporada
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Temporada")
@@ -58,21 +65,6 @@ class Receta
      * })
      */
     private $temporada;
-
-    /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Condimento", inversedBy="idreceta")
-     * @ORM\JoinTable(name="condimento_receta",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="idReceta", referencedColumnName="id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="idCondimento", referencedColumnName="id")
-     *   }
-     * )
-     */
-    private $idcondimento;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -90,24 +82,29 @@ class Receta
     private $idingrediente;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Condimento", inversedBy="idreceta")
+     * @ORM\JoinTable(name="condimento_receta",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="idReceta", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="idCondimento", referencedColumnName="id")
+     *   }
+     * )
+     */
+    private $idcondimento;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
-        $this->idcondimento = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idingrediente = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->idcondimento = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set nombre
@@ -202,6 +199,39 @@ class Receta
     }
 
     /**
+     * Set calificacion
+     *
+     * @param integer $calificacion
+     * @return Receta
+     */
+    public function setCalificacion($calificacion)
+    {
+        $this->calificacion = $calificacion;
+
+        return $this;
+    }
+
+    /**
+     * Get calificacion
+     *
+     * @return integer 
+     */
+    public function getCalificacion()
+    {
+        return $this->calificacion;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
      * Set temporada
      *
      * @param \AppBundle\Entity\Temporada $temporada
@@ -222,39 +252,6 @@ class Receta
     public function getTemporada()
     {
         return $this->temporada;
-    }
-
-    /**
-     * Add idcondimento
-     *
-     * @param \AppBundle\Entity\Condimento $idcondimento
-     * @return Receta
-     */
-    public function addIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
-    {
-        $this->idcondimento[] = $idcondimento;
-
-        return $this;
-    }
-
-    /**
-     * Remove idcondimento
-     *
-     * @param \AppBundle\Entity\Condimento $idcondimento
-     */
-    public function removeIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
-    {
-        $this->idcondimento->removeElement($idcondimento);
-    }
-
-    /**
-     * Get idcondimento
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getIdcondimento()
-    {
-        return $this->idcondimento;
     }
 
     /**
@@ -288,5 +285,38 @@ class Receta
     public function getIdingrediente()
     {
         return $this->idingrediente;
+    }
+
+    /**
+     * Add idcondimento
+     *
+     * @param \AppBundle\Entity\Condimento $idcondimento
+     * @return Receta
+     */
+    public function addIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
+    {
+        $this->idcondimento[] = $idcondimento;
+
+        return $this;
+    }
+
+    /**
+     * Remove idcondimento
+     *
+     * @param \AppBundle\Entity\Condimento $idcondimento
+     */
+    public function removeIdcondimento(\AppBundle\Entity\Condimento $idcondimento)
+    {
+        $this->idcondimento->removeElement($idcondimento);
+    }
+
+    /**
+     * Get idcondimento
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdcondimento()
+    {
+        return $this->idcondimento;
     }
 }

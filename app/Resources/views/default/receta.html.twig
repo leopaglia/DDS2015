@@ -1,0 +1,85 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+	<form class="form-horizontal" role="form">
+
+		<div class="panel panel-primary">
+		
+			<div class="panel-heading">
+				<b>{{ nombre }}</b>
+			</div>
+			
+			<div class="panel-body">
+			
+				<div style="float:left; width:50%;">	
+				
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">Dificultad</label>
+						<input id="dificultad" type="text" class="col-xs-4 borderradius">
+					</div>
+					
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">Clasificacion</label>
+						<input id="clasificacion" type="text" class="col-xs-4 borderradius">
+					</div>
+					
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">Ingredientes</label>
+						<input id="ingredientes" type="text" class="col-xs-4 borderradius">
+					</div>
+					
+					<div class="form-group">
+				    	<label class="col-sm-3 control-label">Condimentos</label>
+						<input id="condimentos" type="text" class="col-xs-4 borderradius">
+					</div>
+			  		
+				</div>
+				
+				<div style="float:right; width:50%;">	
+				
+			  		<div class="form-group">
+			  			<label for="pasos" class="control-label col-xs-3">Pasos:</label>
+			  			<input type="textbox" id="pasos" class="col-xs-4 borderradius">  		
+			  		</div>
+					
+				</div>	
+				
+			</div>
+			
+		</div>
+		
+		<div class="panel panel-primary" style="width:50%;">
+			<div class="panel-body">
+				<div style="float:left; width:50%;">
+					Calificar esta receta
+				</div>
+				<div style="float:right; width:50%;">
+					<input name='star' type='radio'class='star'>
+					<input name='star' type='radio'class='star'>
+					<input name='star' type='radio'class='star'>
+					<input name='star' type='radio'class='star'>
+					<input name='star' type='radio'class='star'>
+				</div>
+			</div>
+		</div>	
+
+	</form>
+
+{% endblock body_container_main%}	
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+	    
+	   		$(".star").rating();
+	
+		});
+
+	</script>	
+
+{% endblock body_js %}
+

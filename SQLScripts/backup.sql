@@ -246,6 +246,38 @@ CREATE TABLE `dds2015`.`condiciones_usuario` (
 ALTER TABLE `dds2015`.`usuario` 
 DROP FOREIGN KEY `condicionSaludFK`;
 
+ALTER TABLE `dds2015`.`usuario` 
+ADD COLUMN `nombre` VARCHAR(45) NULL DEFAULT NULL AFTER `password`,
+ADD COLUMN `apellido` VARCHAR(45) NULL DEFAULT NULL AFTER `nombre`,
+
+ALTER TABLE `dds2015`.`usuario` 
+DROP COLUMN `condicion`,
+DROP INDEX `condicionSaludFK_idx` ;
+
+CREATE TABLE `dds2015`.`grupo` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+
+ CREATE TABLE `dds2015`.`grupo_usuario` (
+  `idGrupo` INT NOT NULL,
+  `idUsuario` INT NOT NULL,
+  PRIMARY KEY (`idGrupo`, `idUsuario`));
+  
+  ALTER TABLE `dds2015`.`grupo_usuario` 
+ADD CONSTRAINT `grupoFK`
+  FOREIGN KEY (`idGrupo`)
+  REFERENCES `dds2015`.`grupo` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `dds2015`.`grupo_usuario` 
+ADD CONSTRAINT `usuFK`
+  FOREIGN KEY (`idUsuario`)
+  REFERENCES `dds2015`.`usuario` (`dni`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

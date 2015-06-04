@@ -8,20 +8,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 /**
  * Usuario
  *
- * @ORM\Table(name="usuario", indexes={@ORM\Index(name="complexionFK_idx", columns={"complexion"}), @ORM\Index(name="condicionSaludFK_idx", columns={"condicion"}), @ORM\Index(name="dietaFK_idx", columns={"dieta"}), @ORM\Index(name="rutinaFK_idx", columns={"rutina"}), @ORM\Index(name="preferenciasFK_idx", columns={"preferencias"})})
+ * @ORM\Table(name="usuario", indexes={@ORM\Index(name="complexionFK_idx", columns={"complexion"}), @ORM\Index(name="dietaFK_idx", columns={"dieta"}), @ORM\Index(name="rutinaFK_idx", columns={"rutina"}), @ORM\Index(name="preferenciasFK_idx", columns={"preferencias"})})
  * @ORM\Entity
  */
 class Usuario implements UserInterface, \Serializable
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="dni", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $dni;
-
     /**
      * @var string
      *
@@ -51,13 +42,6 @@ class Usuario implements UserInterface, \Serializable
     private $altura;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="condicion", type="integer", nullable=true)
-     */
-    private $condicion;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="password", type="string", length=64, nullable=false)
@@ -65,34 +49,27 @@ class Usuario implements UserInterface, \Serializable
     private $password;
 
     /**
-     * @var \AppBundle\Entity\Complexion
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Complexion")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="complexion", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
      */
-    private $complexion;
+    private $nombre;
 
     /**
-     * @var \AppBundle\Entity\Dieta
+     * @var string
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Dieta")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="dieta", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="apellido", type="string", length=45, nullable=true)
      */
-    private $dieta;
+    private $apellido;
 
     /**
-     * @var \AppBundle\Entity\GruposAlimenticios
+     * @var integer
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\GruposAlimenticios")
-     * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="preferencias", referencedColumnName="id")
-     * })
+     * @ORM\Column(name="dni", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $preferencias;
+    private $dni;
 
     /**
      * @var \AppBundle\Entity\Rutina
@@ -105,6 +82,45 @@ class Usuario implements UserInterface, \Serializable
     private $rutina;
 
     /**
+     * @var \AppBundle\Entity\Complexion
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Complexion")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="complexion", referencedColumnName="id")
+     * })
+     */
+    private $complexion;
+
+    /**
+     * @var \AppBundle\Entity\GruposAlimenticios
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\GruposAlimenticios")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="preferencias", referencedColumnName="id")
+     * })
+     */
+    private $preferencias;
+
+    /**
+     * @var \AppBundle\Entity\Dieta
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Dieta")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="dieta", referencedColumnName="id")
+     * })
+     */
+    private $dieta;
+    
+    private $condicion;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Grupo", mappedBy="idusuario")
+     */
+    private $idgrupo;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\CondicionesDeSalud", mappedBy="idusuario")
@@ -114,40 +130,11 @@ class Usuario implements UserInterface, \Serializable
     /**
      * Constructor
      */
-    public function __construct($dni, $user, $pass, $sexo, $edad){
-    	
-    	$this->idcondiciones = new \Doctrine\Common\Collections\ArrayCollection();
-    	
-    	$this->username = $user;
-    	$this->dni = $dni;
-    	$this->password = md5($pass);
-    	$this->sexo = $sexo;
-    	$this->edad = $edad;
-    }
-
-    /**
-     * Get dni
-     *
-     * @return integer 
-     */
-    public function getDni()
+    public function __construct()
     {
-        return $this->dni;
+        $this->idgrupo = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->idcondiciones = new \Doctrine\Common\Collections\ArrayCollection();
     }
-
-    /**
-     * Set username
-     *
-     * @param string $username
-     * @return Usuario
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
 
     /**
      * Set sexo
@@ -219,29 +206,6 @@ class Usuario implements UserInterface, \Serializable
     }
 
     /**
-     * Set condicion
-     *
-     * @param integer $condicion
-     * @return Usuario
-     */
-    public function setCondicion($condicion)
-    {
-        $this->condicion = $condicion;
-
-        return $this;
-    }
-
-    /**
-     * Get condicion
-     *
-     * @return integer 
-     */
-    public function getCondicion()
-    {
-        return $this->condicion;
-    }
-
-    /**
      * Set password
      *
      * @param string $password
@@ -254,74 +218,60 @@ class Usuario implements UserInterface, \Serializable
         return $this;
     }
 
-
     /**
-     * Set complexion
+     * Set nombre
      *
-     * @param \AppBundle\Entity\Complexion $complexion
+     * @param string $nombre
      * @return Usuario
      */
-    public function setComplexion(\AppBundle\Entity\Complexion $complexion = null)
+    public function setNombre($nombre)
     {
-        $this->complexion = $complexion;
+        $this->nombre = $nombre;
 
         return $this;
     }
 
     /**
-     * Get complexion
+     * Get nombre
      *
-     * @return \AppBundle\Entity\Complexion 
+     * @return string 
      */
-    public function getComplexion()
+    public function getNombre()
     {
-        return $this->complexion;
+        return $this->nombre;
     }
 
     /**
-     * Set dieta
+     * Set apellido
      *
-     * @param \AppBundle\Entity\Dieta $dieta
+     * @param string $apellido
      * @return Usuario
      */
-    public function setDieta(\AppBundle\Entity\Dieta $dieta = null)
+    public function setApellido($apellido)
     {
-        $this->dieta = $dieta;
+        $this->apellido = $apellido;
 
         return $this;
     }
 
     /**
-     * Get dieta
+     * Get apellido
      *
-     * @return \AppBundle\Entity\Dieta 
+     * @return string 
      */
-    public function getDieta()
+    public function getApellido()
     {
-        return $this->dieta;
+        return $this->apellido;
     }
 
     /**
-     * Set preferencias
+     * Get dni
      *
-     * @param \AppBundle\Entity\GruposAlimenticios $preferencias
-     * @return Usuario
+     * @return integer 
      */
-    public function setPreferencias(\AppBundle\Entity\GruposAlimenticios $preferencias = null)
+    public function getDni()
     {
-        $this->preferencias = $preferencias;
-
-        return $this;
-    }
-
-    /**
-     * Get preferencias
-     *
-     * @return \AppBundle\Entity\GruposAlimenticios 
-     */
-    public function getPreferencias()
-    {
-        return $this->preferencias;
+        return $this->dni;
     }
 
     /**
@@ -348,12 +298,114 @@ class Usuario implements UserInterface, \Serializable
     }
 
     /**
+     * Set complexion
+     *
+     * @param \AppBundle\Entity\Complexion $complexion
+     * @return Usuario
+     */
+    public function setComplexion(\AppBundle\Entity\Complexion $complexion = null)
+    {
+        $this->complexion = $complexion;
+
+        return $this;
+    }
+
+    /**
+     * Get complexion
+     *
+     * @return \AppBundle\Entity\Complexion 
+     */
+    public function getComplexion()
+    {
+        return $this->complexion;
+    }
+
+    /**
+     * Set preferencias
+     *
+     * @param \AppBundle\Entity\GruposAlimenticios $preferencias
+     * @return Usuario
+     */
+    public function setPreferencias(\AppBundle\Entity\GruposAlimenticios $preferencias = null)
+    {
+        $this->preferencias = $preferencias;
+
+        return $this;
+    }
+
+    /**
+     * Get preferencias
+     *
+     * @return \AppBundle\Entity\GruposAlimenticios 
+     */
+    public function getPreferencias()
+    {
+        return $this->preferencias;
+    }
+
+    /**
+     * Set dieta
+     *
+     * @param \AppBundle\Entity\Dieta $dieta
+     * @return Usuario
+     */
+    public function setDieta(\AppBundle\Entity\Dieta $dieta = null)
+    {
+        $this->dieta = $dieta;
+
+        return $this;
+    }
+
+    /**
+     * Get dieta
+     *
+     * @return \AppBundle\Entity\Dieta 
+     */
+    public function getDieta()
+    {
+        return $this->dieta;
+    }
+
+    /**
+     * Add idgrupo
+     *
+     * @param \AppBundle\Entity\Grupo $idgrupo
+     * @return Usuario
+     */
+    public function addIdgrupo(\AppBundle\Entity\Grupo $idgrupo)
+    {
+        $this->idgrupo[] = $idgrupo;
+
+        return $this;
+    }
+
+    /**
+     * Remove idgrupo
+     *
+     * @param \AppBundle\Entity\Grupo $idgrupo
+     */
+    public function removeIdgrupo(\AppBundle\Entity\Grupo $idgrupo)
+    {
+        $this->idgrupo->removeElement($idgrupo);
+    }
+
+    /**
+     * Get idgrupo
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdgrupo()
+    {
+        return $this->idgrupo;
+    }
+
+    /**
      * Add idcondiciones
      *
      * @param \AppBundle\Entity\CondicionesDeSalud $idcondiciones
      * @return Usuario
      */
-    public function addIdcondicione(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
+    public function addCondicion(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
     {
         $this->idcondiciones[] = $idcondiciones;
 
@@ -365,7 +417,7 @@ class Usuario implements UserInterface, \Serializable
      *
      * @param \AppBundle\Entity\CondicionesDeSalud $idcondiciones
      */
-    public function removeIdcondicione(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
+    public function removeCondicion(\AppBundle\Entity\CondicionesDeSalud $idcondiciones)
     {
         $this->idcondiciones->removeElement($idcondiciones);
     }
@@ -379,8 +431,6 @@ class Usuario implements UserInterface, \Serializable
     {
         return $this->idcondiciones;
     }
-    
-    
 
 
     //INTERFACE METHODS
@@ -435,4 +485,5 @@ class Usuario implements UserInterface, \Serializable
     			// $this->salt
     	) = unserialize($serialized);
     }
-}
+ }
+    

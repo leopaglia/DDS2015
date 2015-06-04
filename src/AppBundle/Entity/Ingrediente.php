@@ -13,15 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Ingrediente
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
@@ -43,6 +34,15 @@ class Ingrediente
     private $caloriasPorcion;
 
     /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
      * @var \Doctrine\Common\Collections\Collection
      *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Receta", mappedBy="idingrediente")
@@ -57,16 +57,6 @@ class Ingrediente
         $this->idreceta = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set nombre
@@ -135,6 +125,16 @@ class Ingrediente
     public function getCaloriasPorcion()
     {
         return $this->caloriasPorcion;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

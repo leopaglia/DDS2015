@@ -13,15 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 class Condimento
 {
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
-    private $id;
-
-    /**
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
@@ -34,6 +25,15 @@ class Condimento
      * @ORM\Column(name="tipo", type="integer", nullable=true)
      */
     private $tipo;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -50,16 +50,6 @@ class Condimento
         $this->idreceta = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
-
-    /**
-     * Get id
-     *
-     * @return integer 
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * Set nombre
@@ -105,6 +95,16 @@ class Condimento
     public function getTipo()
     {
         return $this->tipo;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer 
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

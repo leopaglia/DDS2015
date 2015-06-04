@@ -5,17 +5,17 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * CondicionesDeSalud
+ * Grupo
  *
- * @ORM\Table(name="condiciones_de_salud")
+ * @ORM\Table(name="grupo")
  * @ORM\Entity
  */
-class CondicionesDeSalud
+class Grupo
 {
     /**
      * @var string
      *
-     * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
+     * @ORM\Column(name="nombre", type="string", length=45, nullable=false)
      */
     private $nombre;
 
@@ -31,10 +31,10 @@ class CondicionesDeSalud
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idcondiciones")
-     * @ORM\JoinTable(name="condiciones_usuario",
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idgrupo")
+     * @ORM\JoinTable(name="grupo_usuario",
      *   joinColumns={
-     *     @ORM\JoinColumn(name="idCondiciones", referencedColumnName="id")
+     *     @ORM\JoinColumn(name="idGrupo", referencedColumnName="id")
      *   },
      *   inverseJoinColumns={
      *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="dni")
@@ -56,7 +56,7 @@ class CondicionesDeSalud
      * Set nombre
      *
      * @param string $nombre
-     * @return CondicionesDeSalud
+     * @return Grupo
      */
     public function setNombre($nombre)
     {
@@ -89,7 +89,7 @@ class CondicionesDeSalud
      * Add idusuario
      *
      * @param \AppBundle\Entity\Usuario $idusuario
-     * @return CondicionesDeSalud
+     * @return Grupo
      */
     public function addIdusuario(\AppBundle\Entity\Usuario $idusuario)
     {

@@ -1,7 +1,171 @@
 {% extends "base.html.twig" %}
 
 {% block body_container_main %}
+
+{# 	<form class="form-horizontal" action="{{ path('buscarRecetas') }}" method="post" role="form"> #}
 	
+		<div class="panel panel-primary">
+				
+			<div class="panel-heading">
+    			<h3 class="panel-title">Filtros de B&uacute;squeda</h3>
+  			</div>
+  					
+			<div class="panel-body">
+					
+				<div style="float:left; width:50%;">
+		
+					<div class="form-group">
+				    	<label for="ingrediente" class="control-label col-sm-3">Ingrediente Principal:</label>
+				    	<div class="col-sm-7">
+							<input id="ingrediente" type="text" class="form-control col-xs-4 col-lg-1" name="ingrediente" placeholder=" Ingrese Ingrediente Principal">
+						</div>
+					</div>	 
+					
+					<div class="form-group">
+				    	<label for="temporada" class="control-label col-sm-3">Temporada:</label>
+						<div class="col-sm-7">
+							<select id="temporada" type="text" class="form-control col-lg-2" name="temporada">
+								<!-- options -->
+							</select>
+						</div>	 
+					</div>
+					
+				</div>
+				
+				
+				<div style="float:right; width:50%;">	 
+				
+					<div class="form-group">
+				    	<label for="calorias" class="control-label col-sm-3">Calor&iacute;as:</label>
+				    	<div id="calorias" class="col-sm-7">
+				    		<div class="col-sm-3">
+								<input id="calorias" type="text" class="form-control" name="calorias" placeholder="Desde">
+							</div>
+							<div class="col-sm-3">
+								<input id="calorias" type="text" class="form-control" name="calorias" placeholder="Hasta">
+							</div>
+						</div>
+					</div>
+					
+					<div class="form-group">
+				    	<label for="dificultad" class="control-label col-sm-3">Dificultad:</label>
+						<div class="col-sm-7">
+							<div class="col-sm-12">
+								<select id="temporada" type="text" class="form-control col-lg-2" name="temporada">
+									<!-- options -->
+								</select>	
+							</div>
+						</div>	 
+					</div>	 
+				
+				</div>	
+				
+			</div>
+			
+			
+			<div class="panel-footer" style="overflow: hidden;">
+				<input type="button" id="buscar" value="Buscar" class="btn btn-default" style="float: right;">
+				<input type="button" id="limpiar" value="Limpiar" class="btn btn-default" style="float: right; margin-right: 10px;">
+			</div>
+			
+			
+		</div>
+	
+{# 	</form> #}
+
+		
+	
+	
+	<div class="panel panel-default">
+
+		<div class="panel-heading">
+    		<h3 class="panel-title">Seleccionar Receta</h3>
+  		</div>
+  					
+		<div class="panel-body">
+			<table id="tablaRecetas" class="table table-bordered">	
+				<thead>
+					<tr>
+					  <th>Nombre</th>
+					  <th>Temporada</th>	
+					  <th>Dificultad</th>
+					  <th>Calor&iacute;as por porci&oacute;n</th>	
+					  <th>Calificaci&oacute;n</th>
+					  <th>Acciones</th>
+					</tr>
+			   </thead>
+			</table>
+		</div>
+		
+	</div>	
 
 {% endblock body_container_main%}	
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+
+			var starTag = "<input name='star' type='radio'class='star' disabled='disabled'>";
+			var checkedStarTag = "<input name='star' type='radio'class='star' checked='checked' disabled='disabled'>";
+
+			
+			var printStars = function(data){
+
+				var localAux = '';
+				
+				for(var i = 1; i < data; i++)
+					localAux = localAux+starTag;
+
+				localAux = localAux+checkedStarTag;
+
+				for(var j = 0; j < (5-i); j++)
+					localAux = localAux+starTag;
+
+				return localAux;
+			}
+
+			
+			var table = $("#tablaRecetas").DataTable({
+							"dom" : 't',
+							"autoWidth" : true,
+					        "columns": [
+					                    { "data": "nombre"},
+					                    { "data": "temporada" },
+					                    { "data": "dificultad" },
+					                    { "data": "calorias" },
+// 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
+										{ "data": "calificacion"}, //hasta arreglar el plugin
+					                    { "data": null, "render": function ( data, type, full, meta ) {return "<a href='#'>Agregar a perfil</a>"} }
+					                ]
+						});
+
+			
+			$('#buscar').click(function() {
+
+				 $.ajax({
+						type: 'POST',
+						data:{},
+						url: "{{ path('buscarRecetas') }}"
+					}).success(function(data, textStatus, jqXHR){
+
+						table.clear();
+						table.rows.add(data).draw();
+						
+						$(".star").rating();
+						
+					});
+
+			});			
+			
+
+
+		});
+
+	</script>		
+
+{% endblock body_js %}
 

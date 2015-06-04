@@ -44,83 +44,83 @@
 
 	<div id="basicFormPanel" class="panel panel-default form-group">
  		
-		<form action="{{ path(config.routename) }}"method="post">
+{# 		<form action="{{ path(config.routename) }}"method="post">#}
 	 	
-	 		<div class="panel-heading well"> <b>Modificar perfil</b> </div>
-	 	
-	 		<div class="panel-body">
+ 		<div class="panel-heading well"> <b>{{ title }}</b> </div>
+ 	
+ 		<div class="panel-body">
+	
+		{% if config.display == "accordion" %}
+			<div id="accordion">
 		
-			{% if config.display == "accordion" %}
-				<div id="accordion">
-			
-				{% for set in fieldsets %}
-					<h3>{{ set.title }}</h3>
-					<div>
-						{% for field in set.fields %}
+			{% for set in fieldsets %}
+				<h3>{{ set.title }}</h3>
+				<div>
+					{% for field in set.fields %}
+						
+						{% if field.type == "input" %}
+							<div class="form-group">
+							    <label for="{{ field.idName }}">{{ field.label }}</label>
+							    <input type="text" class="form-control" id="{{ field.idName }}" name="{{ field.idName }}" placeholder="{{ field.placeholder }}"/>
+							</div>
+						{% endif %}
+						
+						{% if field.type == "select" %}
+							<div class="form-group">
+							    <label for="{{ field.idName }}">{{ field.label }}:</label>
+							    <select id="{{ field.idName }}" name="{{ field.idName }}" class="form-control">
+							    	{% for option in field.options %}
+							  	   		<option value="{{ option.value }}">{{ option.name }}</option>
+								   {% endfor %}
+								</select>   
+							</div>
+						{% endif %}
+						
+						{% if field.type == "multiselect" %}
+							<div class="form-group">
+							    <label for="{{ field.idName }}">{{ field.label }}:</label>
+							    <select multiple="multiple" id="{{ field.idName }}" name="{{ field.idName }}" class="form-control multiselect">
+							    	{% for option in field.options %}
+							  	   		<option value="{{ option.value }}">{{ option.name }}</option>
+								   {% endfor %}
+								</select>   
+							</div>
+						{% endif %}
+						
+						{% if field.type == "draganddrop" %} <!-- FIXME -->
 							
-							{% if field.type == "input" %}
-								<div class="form-group">
-								    <label for="{{ field.idName }}">{{ field.label }}</label>
-								    <input type="text" class="form-control" id="{{ field.idName }}" name="{{ field.idName }}" placeholder="{{ field.placeholder }}"/>
+							<div class="well inline dragContainer">
+								<div class="">
+									{% for item in field.draggables %}
+										<div id="{{ item.id }}" class="draggable btn-default">{{ item.text }}</div>
+									{% endfor %}
 								</div>
-							{% endif %}
-							
-							{% if field.type == "select" %}
-								<div class="form-group">
-								    <label for="{{ field.idName }}">{{ field.label }}:</label>
-								    <select id="{{ field.idName }}" name="{{ field.idName }}" class="form-control">
-								    	{% for option in field.options %}
-								  	   		<option value="{{ option.value }}">{{ option.name }}</option>
-									   {% endfor %}
-									</select>   
-								</div>
-							{% endif %}
-							
-							{% if field.type == "multiselect" %}
-								<div class="form-group">
-								    <label for="{{ field.idName }}">{{ field.label }}:</label>
-								    <select multiple="multiple" id="{{ field.idName }}" name="{{ field.idName }}" class="form-control multiselect">
-								    	{% for option in field.options %}
-								  	   		<option value="{{ option.value }}">{{ option.name }}</option>
-									   {% endfor %}
-									</select>   
-								</div>
-							{% endif %}
-							
-							{% if field.type == "draganddrop" %} <!-- FIXME -->
+							</div>
 								
-								<div class="well inline dragContainer">
-									<div class="">
-										{% for item in field.draggables %}
-											<div id="{{ item.id }}" class="draggable btn-default">{{ item.text }}</div>
-										{% endfor %}
-									</div>
-								</div>
-									
-								<div class="well inline dropContainer">
-									<p>drop zone</p>
-								</div>
-							
-							{% endif %}
-							
-					    {% endfor %}
-					 </div>
-					    
-				 {% endfor %}  
-		   		</div>
-		   	{% endif %}
-		   		
-		    </div>
+							<div class="well inline dropContainer">
+								<p>drop zone</p>
+							</div>
+						
+						{% endif %}
+						
+				    {% endfor %}
+				 </div>
+				    
+			 {% endfor %}  
+	   		</div>
+	   	{% endif %}
+	   		
+	    </div>
+	    
+		<div class="panel-footer">
+		
+		    {% for button in buttons %}
+ 				<button type="{{ button.type }}" id="sendData" class="boton btn btn-default">{{ button.text }}</button>
+		    {% endfor %}
 		    
-			<div class="panel-footer">
+		</div>
 			
-			    {% for button in buttons %}
-	 				<button type="{{ button.type }}" class="boton btn btn-default">{{ button.text }}</button>
-			    {% endfor %}
-			    
-			</div>
-			
-		</form>
+{# 		</form>#}
 			
 	 </div>   
 
@@ -134,6 +134,9 @@
     	
 		$(document).ready(function() {
 
+
+			//INIT
+			
 			$("#accordion").accordion({
 				header: "h3",
 				collapsible: true,
@@ -141,7 +144,27 @@
 				
 			});
 
-			$(".multiselect").multiSelect();
+			{% for set in fieldsets %}
+				{% for field in set.fields %}
+				
+					{% if field.type == "multiselect" %}
+						var {{ field.idName }} = new Array();
+			
+						$("#{{ field.idName }}").multiSelect({
+							  afterSelect: function(values){
+								  {{ field.idName }}.push(values);
+								  },
+							  afterDeselect: function(values){
+								  if ({{ field.idName }}.indexOf(values) > -1) {
+									  {{ field.idName }}.splice({{ field.idName }}.indexOf(5), 1);
+									}
+								  },
+						});
+					{% endif %}	
+	
+				{% endfor %}
+			{% endfor %}
+			
 			$('.multiselect').multiSelect('deselect_all');
 
 			
@@ -159,9 +182,39 @@
 		        drop: function( event, ui ) {
 		        }
 		    });
-			
-		});
-			
+
+
+
+		    $('#sendData').click(function() {
+
+				{% for set in fieldsets %}
+					{% for field in set.fields %}
+					
+						{% if (field.type == "input") or (field.type == "select") %}
+							var {{ field.idName }} = $("#{{ field.idName }}").val();
+						{% endif %}	
+						
+					{% endfor %}
+				{% endfor %}
+
+			    $.ajax({
+					type: 'POST',
+					data:{
+						{% for set in fieldsets %}
+							{% for field in set.fields %}
+								{{ field.idName }}:{{ field.idName }},
+							{% endfor %}
+						{% endfor %}
+					},
+					url: "{{ path(config.routename) }}"
+				}).success(function(data, textStatus, jqXHR){
+					window.location.href = data;
+				});
+				
+		    });
+
+		});	        
+
 	</script>
 
 {% endblock body_js %}
