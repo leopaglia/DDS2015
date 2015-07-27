@@ -44,8 +44,6 @@
 
 	<div id="basicFormPanel" class="panel panel-default form-group">
  		
-{# 		<form action="{{ path(config.routename) }}"method="post">#}
-	 	
  		<div class="panel-heading well"> <b>{{ title }}</b> </div>
  	
  		<div class="panel-body">
@@ -134,15 +132,16 @@
     	
 		$(document).ready(function() {
 
+            //INIT
 
-			//INIT
-			
 			$("#accordion").accordion({
 				header: "h3",
 				collapsible: true,
-				active: false,
+				active: false
 				
 			});
+
+            //MULTISELECT INIT
 
 			{% for set in fieldsets %}
 				{% for field in set.fields %}
@@ -183,9 +182,32 @@
 		        }
 		    });
 
+            //END MULTISELECT INIT
+
+
+            //WRITE DATA
+
+            {% for set in fieldsets %}
+                {% for field in set.fields %}
+
+                    {% if field.value is defined %}
+
+                        {% if field.type == "input" or field.type == "select" %}
+                        $("#{{ field.idName }}").val( "{{ field.value }}" );
+                        {% endif %}
+
+                    {% endif %}
+
+                {% endfor %}
+            {% endfor %}
+
+
+            //END WRITE DATA
 
 
 		    $('#sendData').click(function() {
+
+                app.showLoading("Guardando datos");
 
 				{% for set in fieldsets %}
 					{% for field in set.fields %}

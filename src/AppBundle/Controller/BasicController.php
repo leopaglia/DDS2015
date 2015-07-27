@@ -8,12 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 
-use AppBundle\Entity\Usuario;
-
 class BasicController extends Controller{
 	
 	protected function renderBasicForm($fieldsets, $buttons, $config, $title){
-		
+
 		return $this->render('Basic/basicForm.html.twig', array("fieldsets" => $fieldsets, "buttons" => $buttons, "config" => $config, "title" => $title));
 	}
 	

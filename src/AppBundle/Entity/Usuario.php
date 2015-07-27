@@ -111,7 +111,12 @@ class Usuario implements UserInterface, \Serializable
      */
     private $dieta;
     
-    private $condicion;
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Receta", mappedBy="idusuario")
+     */
+    private $idreceta;
 
     /**
      * @var \Doctrine\Common\Collections\Collection
@@ -132,6 +137,7 @@ class Usuario implements UserInterface, \Serializable
      */
     public function __construct()
     {
+		$this->idreceta = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idgrupo = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idcondiciones = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -430,6 +436,39 @@ class Usuario implements UserInterface, \Serializable
     public function getIdcondiciones()
     {
         return $this->idcondiciones;
+    }
+	
+	    /**
+     * Add idreceta
+     *
+     * @param \AppBundle\Entity\Receta $idreceta
+     * @return Usuario
+     */
+    public function addIdreceta(\AppBundle\Entity\Receta $idreceta)
+    {
+        $this->idreceta[] = $idreceta;
+
+        return $this;
+    }
+
+    /**
+     * Remove idreceta
+     *
+     * @param \AppBundle\Entity\Receta $idreceta
+     */
+    public function removeIdreceta(\AppBundle\Entity\Receta $idreceta)
+    {
+        $this->idreceta->removeElement($idreceta);
+    }
+
+    /**
+     * Get idreceta
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdreceta()
+    {
+        return $this->idreceta;
     }
 
 

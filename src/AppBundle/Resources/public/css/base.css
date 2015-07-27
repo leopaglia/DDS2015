@@ -18,11 +18,6 @@
 	min-width: 230px !important;
 }
 
-/* .ui-menu-item{ */
-/* 	max-width: 15%; */
-/* } */
-
-<base href="{{ baseURL | default("") }}" />
 .form-group {
 	margin-bottom: 7px !important;
 }
@@ -43,4 +38,19 @@ td.group {
 }
 #container{
 	max-width: 90% !important;
+}
+.zoomIt{
+    display:inline-block;
+    -webkit-transition:-webkit-transform 0.3s ease-out;
+    -moz-transition:-moz-transform 0.3s ease-out;
+    -o-transition:-o-transform 0.3s ease-out;
+    -ms-transition:-ms-transform 0.3s ease-out;
+    transition:transform 0.3s ease-out;
+}
+.zoomIt:hover{
+    -moz-transform: scale(1.5);
+    -webkit-transform: scale(1.5);
+    -o-transform: scale(1.5);
+    -ms-transform: scale(1.5);
+    transform: scale(1.5)
 }

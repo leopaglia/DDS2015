@@ -9,9 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
-
 use Doctrine\ORM\EntityRepository;
-
 use AppBundle\Entity\Usuario;
 use AppBundle\Entity\CondicionesDeSalud;
 use AppBundle\Entity\Rutina;
@@ -31,39 +29,47 @@ class UserController extends BasicController{
     public function modifyProfileAction(){
     	
     	//Datos
-    	
-    	$complexiones = $this->getDoctrine()->getRepository("AppBundle:Complexion")->findAll();
-     	$condiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
-     	$rutinas = $this->getDoctrine()->getRepository("AppBundle:Rutina")->findAll();
-    	
-    	$arrayComplexiones = array();
-     	$arrayCondiciones = array();
-     	$arrayRutinas = array();
-    	
-    	foreach ($complexiones as $c){
-    		$arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
-    	}
-     	foreach ($condiciones as $c){
-     		$arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId());
-     	}
-     	foreach ($rutinas as $r){
-     		$arrayRutinas[] = array("name" => $r->getNombre(), "value" => $r->getId());
-     	}
+
+            //Generales
+
+            $complexiones = $this->getDoctrine()->getRepository("AppBundle:Complexion")->findAll();
+            $condiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
+            $rutinas = $this->getDoctrine()->getRepository("AppBundle:Rutina")->findAll();
+
+            $arrayComplexiones = array();
+            $arrayCondiciones = array();
+            $arrayRutinas = array();
+
+            foreach ($complexiones as $c){
+                $arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
+            }
+            foreach ($condiciones as $c){
+                $arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId());
+            }
+            foreach ($rutinas as $r){
+                $arrayRutinas[] = array("name" => $r->getNombre(), "value" => $r->getId());
+            }
+
+            //Usuario
+
+            $dni = $this->getUser();
+            $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+
 
      	//Vista
      	
      	$fieldsets = array(
      		
      			array("title" => "Detalle de Usuario", "fields" => array(
-     					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese su Nombre"),
-     					array("label" => "Apellido", "type" => "input", "idName" => "apellido", "placeholder" => "Ingrese su Apellido"),
-     					array("label" => "Edad", "type" => "input", "idName" => "edad", "placeholder" => "Ingrese su Edad"),
-     					array("label" => "Altura", "type" => "input", "idName" => "altura", "placeholder" => "Ingrese su Altura (en centimetros)"),
-     					array("label" => "Rutina", "type" => "select", "idName" => "rutina", "options" => $arrayRutinas)
+     					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese su Nombre", "value" => $user->getNombre()),
+     					array("label" => "Apellido", "type" => "input", "idName" => "apellido", "placeholder" => "Ingrese su Apellido", "value" => $user->getApellido()),
+     					array("label" => "Edad", "type" => "input", "idName" => "edad", "placeholder" => "Ingrese su Edad", "value" => $user->getEdad()),
+     					array("label" => "Altura", "type" => "input", "idName" => "altura", "placeholder" => "Ingrese su Altura (en centimetros)", "value" => $user->getAltura()),
+     					array("label" => "Rutina", "type" => "select", "idName" => "rutina", "options" => $arrayRutinas, "value" => $user->getRutina()->getId())
      			)),
      					
      			array("title" => "Complexion", "fields" => array(
-     					array("label" => "Complexion", "type" => "select", "idName" => "complexion", "options" => $arrayComplexiones),
+     					array("label" => "Complexion", "type" => "select", "idName" => "complexion", "options" => $arrayComplexiones, "value" => $user->getComplexion()->getId()),
      			)),
      			
      			array("title" => "Condiciones Preexistentes", "fields" => array(
@@ -81,7 +87,6 @@ class UserController extends BasicController{
     			"display"   => "accordion",
     			"routename" => "updateProfile",
     	);
-    	
     	
 	    return $this->renderBasicForm($fieldsets, $buttons, $config, "Modificar perfil");
     }
@@ -119,24 +124,27 @@ class UserController extends BasicController{
     		if(!empty($altura))
 	    		$user->setAltura($altura);
     		if(!empty($rutina))
-	    		$user->setRutina($rutina);
+	    		$user->setRutina($this->getDoctrine()->getRepository("AppBundle:Rutina")->find($rutina));
     		if(!empty($complexion))
 	    		$user->setComplexion($this->getDoctrine()->getRepository("AppBundle:Complexion")->find($complexion));
     		if(!empty($condiciones))
 	    		foreach($condiciones as $condicion)
-		    		$user->addCondicion($this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicion[0]));
+		    		$user->addCondicion($this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicion[0])); //FIXME?? capaz no //TESTME lel
 		    	
 	    	$em->persist($user);
 	    	$em->flush();
     			
-    	}catch(exception $e){
+    	}catch(\Exception $e){
     		$em->rollback();
-    		throw($e);
-    	}
+
+            $session = $this->getRequest()->getSession();
+            $session->getFlashBag()->add('error', "[DEGUG]".$e->getMessage());
+
+        }
     	
     	$em->commit();
     	
-    	return new Response($this->generateUrl("homepage"));
+    	return new Response($this->generateUrl("modifyProfile")); //Reload to
     	
     }
     
@@ -147,7 +155,7 @@ class UserController extends BasicController{
     	
     	$nombre = $request->get("nombre");
     	
-    	$qb = $this->getEntityManager()->createQueryBuilder();
+    	$qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
 
 		$qb->select("u")
 			->from("AppBundle:Usuario", "u");
@@ -158,11 +166,10 @@ class UserController extends BasicController{
 			$qb->setParameter(':nombre', '%'.$nombre.'%');
 		}
 		
-		$usuario = $qb->getQuery()->Result();
-		$usuario = $usuario[0];
-		
-		$arrayUsuario = array();
-		
+		$usuario = $qb->getQuery()->getFirstResult();
+
+        $arrayUsuario = array();
+
 		$arrayUsuario["id"] = $usuario->getId();
 		$arrayUsuario["nombre"] = $usuario->getUsername();
 		

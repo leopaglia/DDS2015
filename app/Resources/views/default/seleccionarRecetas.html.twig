@@ -9,27 +9,30 @@
 			<div class="panel-heading">
     			<h3 class="panel-title">Filtros de B&uacute;squeda</h3>
   			</div>
-  					
+
 			<div class="panel-body">
-					
+
 				<div style="float:left; width:50%;">
-		
+
 					<div class="form-group">
 				    	<label for="ingrediente" class="control-label col-sm-3">Ingrediente Principal:</label>
 				    	<div class="col-sm-7">
 							<input id="ingrediente" type="text" class="form-control col-xs-4 col-lg-1" name="ingrediente" placeholder=" Ingrese Ingrediente Principal">
 						</div>
-					</div>	 
-					
+					</div>
+
 					<div class="form-group">
 				    	<label for="temporada" class="control-label col-sm-3">Temporada:</label>
 						<div class="col-sm-7">
 							<select id="temporada" type="text" class="form-control col-lg-2" name="temporada">
-								<!-- options -->
+                                <option value="" selected>Cualquier Temporada</option>
+								{% for temporada in data.temporadas %}
+                                    <option value="{{ temporada.id }}">{{ temporada.nombre }}</option>
+                                {% endfor %}
 							</select>
-						</div>	 
+						</div>
 					</div>
-					
+
 				</div>
 				
 				
@@ -39,10 +42,10 @@
 				    	<label for="calorias" class="control-label col-sm-3">Calor&iacute;as:</label>
 				    	<div id="calorias" class="col-sm-7">
 				    		<div class="col-sm-3">
-								<input id="calorias" type="text" class="form-control" name="calorias" placeholder="Desde">
+								<input id="caloriasDesde" type="text" class="form-control" name="caloriasDesde" placeholder="Desde">
 							</div>
 							<div class="col-sm-3">
-								<input id="calorias" type="text" class="form-control" name="calorias" placeholder="Hasta">
+								<input id="caloriasHasta" type="text" class="form-control" name="caloriasHasta" placeholder="Hasta">
 							</div>
 						</div>
 					</div>
@@ -51,8 +54,11 @@
 				    	<label for="dificultad" class="control-label col-sm-3">Dificultad:</label>
 						<div class="col-sm-7">
 							<div class="col-sm-12">
-								<select id="temporada" type="text" class="form-control col-lg-2" name="temporada">
-									<!-- options -->
+								<select id="dificultad" type="text" class="form-control col-lg-2" name="dificultad">
+                                    <option value="" selected>Cualquier Dificultad</option>
+                                    {% for dificultad in data.dificultades %}
+                                        <option value="{{ dificultad.id }}">{{ dificultad.descripcion }}</option>
+                                    {% endfor %}
 								</select>	
 							</div>
 						</div>	 
@@ -116,19 +122,55 @@
 			var printStars = function(data){
 
 				var localAux = '';
-				
-				for(var i = 1; i < data; i++)
-					localAux = localAux+starTag;
 
-				localAux = localAux+checkedStarTag;
+                var i;
+                var j;
 
-				for(var j = 0; j < (5-i); j++)
+                for(i = 1; i < data; i++) {
+                    localAux = localAux + starTag;
+                }
+
+                localAux = localAux+checkedStarTag;
+
+				for(j = 0; j < (5-i); j++)
 					localAux = localAux+starTag;
 
 				return localAux;
 			}
 
-			
+            function eventsOnCallback() {
+
+                return(
+
+                        $('.add').click(function() {
+
+                            var button = $(this);
+                            var row = button.parent().parent(); // button - td - tr
+                            var id = table.row(row).data().id;
+
+                            var loadingurl = app.root+"bundles/app/img/loading.gif";
+                            var checkurl = app.root+"bundles/app/img/check_on.png";
+
+                            var loadingImg = $('<img src='+loadingurl+' />');
+                            button.replaceWith(loadingImg);
+
+                            $.ajax({
+                                type: 'POST',
+                                data:{
+                                    'id' : id
+                                },
+                                url: "{{ data.url.agregarAPerfil }}"
+                            }).success(function(data, textStatus, jqXHR){
+
+                                loadingImg.replaceWith('<img src='+checkurl+' />');
+
+                            });
+
+                        })
+                );
+
+            }
+
 			var table = $("#tablaRecetas").DataTable({
 							"dom" : 't',
 							"autoWidth" : true,
@@ -139,31 +181,47 @@
 					                    { "data": "calorias" },
 // 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
 										{ "data": "calificacion"}, //hasta arreglar el plugin
-					                    { "data": null, "render": function ( data, type, full, meta ) {return "<a href='#'>Agregar a perfil</a>"} }
-					                ]
-						});
+					                    { "data": null, "render": function ( data, type, full, meta ) {return app.createIcon("add", "Agregar al Perfil")} }
 
-			
+					                ],
+                            "drawCallback": function(settings, json) {
+                                eventsOnCallback();
+                            }
+
+            });
+
 			$('#buscar').click(function() {
+
+//                app.showLoading("Buscando recetas");
 
 				 $.ajax({
 						type: 'POST',
-						data:{},
+						data:{
+                            'ingrediente' : $("#ingrediente").val(),
+                            'temporada' : $("#temporada").val(),
+                            'caloriasDesde' : $("#caloriasDesde").val(),
+                            'caloriasHasta' : $("#caloriasHasta").val(),
+                            'dificultad' : $("#dificultad").val()
+                        },
 						url: "{{ path('buscarRecetas') }}"
 					}).success(function(data, textStatus, jqXHR){
 
+//                        app.hideLoading();
 						table.clear();
 						table.rows.add(data).draw();
+
+
 						
 						$(".star").rating();
 						
 					});
 
-			});			
-			
+			});
 
 
-		});
+
+
+        });
 
 	</script>		
 

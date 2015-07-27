@@ -7,8 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Receta
  *
- * @ORM\Table(name="receta", indexes={@ORM\Index(name="temporadaFK_idx", columns={"temporada"})})
- * @ORM\Entity
+ * @ORM\Table(name="receta", indexes={@ORM\Index(name="temporadaFK_idx", columns={"temporada"}), @ORM\Index(name="dificultadFK_idx", columns={"dificultad"})})
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\RecetasRepository")
  */
 class Receta
 {
@@ -18,13 +18,6 @@ class Receta
      * @ORM\Column(name="nombre", type="string", length=45, nullable=true)
      */
     private $nombre;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="dificultad", type="integer", nullable=true)
-     */
-    private $dificultad;
 
     /**
      * @var integer
@@ -57,6 +50,16 @@ class Receta
     private $id;
 
     /**
+     * @var \AppBundle\Entity\Dificultad
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Dificultad")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="dificultad", referencedColumnName="id")
+     * })
+     */
+    private $dificultad;
+
+    /**
      * @var \AppBundle\Entity\Temporada
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Temporada")
@@ -81,6 +84,21 @@ class Receta
      */
     private $idingrediente;
 
+	  /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idreceta")
+     * @ORM\JoinTable(name="receta_usuario",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="idreceta", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="idusuario", referencedColumnName="dni")
+     *   }
+     * )
+     */
+    private $idusuario;
+	
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
@@ -101,6 +119,7 @@ class Receta
      */
     public function __construct()
     {
+		$this->idusuario = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idingrediente = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idcondimento = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -127,29 +146,6 @@ class Receta
     public function getNombre()
     {
         return $this->nombre;
-    }
-
-    /**
-     * Set dificultad
-     *
-     * @param integer $dificultad
-     * @return Receta
-     */
-    public function setDificultad($dificultad)
-    {
-        $this->dificultad = $dificultad;
-
-        return $this;
-    }
-
-    /**
-     * Get dificultad
-     *
-     * @return integer 
-     */
-    public function getDificultad()
-    {
-        return $this->dificultad;
     }
 
     /**
@@ -232,6 +228,29 @@ class Receta
     }
 
     /**
+     * Set dificultad
+     *
+     * @param \AppBundle\Entity\Dificultad $dificultad
+     * @return Receta
+     */
+    public function setDificultad(\AppBundle\Entity\Dificultad $dificultad = null)
+    {
+        $this->dificultad = $dificultad;
+
+        return $this;
+    }
+
+    /**
+     * Get dificultad
+     *
+     * @return \AppBundle\Entity\Dificultad 
+     */
+    public function getDificultad()
+    {
+        return $this->dificultad;
+    }
+
+    /**
      * Set temporada
      *
      * @param \AppBundle\Entity\Temporada $temporada
@@ -287,6 +306,39 @@ class Receta
         return $this->idingrediente;
     }
 
+	    /**
+     * Add idusuario
+     *
+     * @param \AppBundle\Entity\Usuario $idusuario
+     * @return Receta
+     */
+    public function addIdusuario(\AppBundle\Entity\Usuario $idusuario)
+    {
+        $this->idusuario[] = $idusuario;
+
+        return $this;
+    }
+
+    /**
+     * Remove idusuario
+     *
+     * @param \AppBundle\Entity\Usuario $idusuario
+     */
+    public function removeIdusuario(\AppBundle\Entity\Usuario $idusuario)
+    {
+        $this->idusuario->removeElement($idusuario);
+    }
+
+    /**
+     * Get idusuario
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdusuario()
+    {
+        return $this->idusuario;
+    }
+	
     /**
      * Add idcondimento
      *

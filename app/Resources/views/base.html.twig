@@ -78,7 +78,7 @@
 
 					{% block console_notice %}
 					    <!-- Consola de Mensaje de Alerta -->
-						<div class="alert alert-danger" id="notices">
+						<div class="alert alert-info" id="notices">
 					    	<ul>{% for flashMessage in app.session.flashbag.get('notice') %}<li>{{ flashMessage }}</li>{% endfor %}</ul>
 					    </div>
 					{% endblock %}
@@ -109,32 +109,45 @@
           	{% block dialog3 %}{% endblock %}
           	
         {%endblock body_container%}
-        
+
+
         {% block body_js %}
         
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-2.1.4.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-ui.js")}}"></script>
+            <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.blockUI.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.filter.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multi-select.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.dataTables.js")}}"></script>
         	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.rating.js")}}"></script>
-        	
-        	<script type="text/javascript">
 
-			$(document).ready(function() {
-						if ($("#errores ul li").length > 0){
-							$("#errores").show();
-						}
 
-						if ($("#notices ul li").length > 0){
-							$("#notices").show();
-						}
 
-						$("#user_info").menu({ position: { my: "right top", at: "right-1 top+35" } });
-				});
-				
-			</script>
-       	 {% endblock body_js %}
+            <script type="text/javascript" src="{{  asset("bundles/app/js/App.js") }}"></script>
+
+            <script type="text/javascript">
+
+                $(document).ready(function() {
+
+                    window.app = new App(); //Global functions
+
+                    window.app.init("{{ asset("") }}");
+
+                    if ($("#errores ul li").length > 0){
+                        $("#errores").show();
+                    }
+
+                    if ($("#notices ul li").length > 0){
+                        $("#notices").show();
+                    }
+
+                    $("#user_info").menu({ position: { my: "right top", at: "right-1 top+35" } });
+                });
+
+            </script>
+
+        {% endblock body_js %}
+
     </body>
 </html>
