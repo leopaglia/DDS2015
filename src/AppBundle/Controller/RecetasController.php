@@ -29,8 +29,18 @@ class RecetasController extends BasicController{
 
 	    return $this->render('Default/seleccionarRecetas.html.twig', array("title" => "Seleccionar Recetas", "data" => $data));
     }
+
+
+    /**
+     * @Route("/reportes", name="reports")
+     */
+    public function reportsAction(Request $request){
+
+        return $this->render('Default/reportes.html.twig', array("title" => "Reportes"));
+
+    }
     
-    
+
     /**
      * @Route("/buscarRecetas", name="buscarRecetas")
      */
@@ -74,7 +84,49 @@ class RecetasController extends BasicController{
     	
     	return new JsonResponse($arrayRecetas);
     }
-    
+
+    /**
+     * @Route("/generarReporte", name="generarReporte")
+     */
+    public function generarReporteAction(Request $request){
+
+        $dni = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+
+        $filtros = array();
+
+        $filtros['tipoReporte'] = $request->request->get('tipoReporte');
+        $filtros['fechaDesde'] = $request->request->get('fechaDesde');
+        $filtros['fechaHasta'] = $request->request->get('fechaHasta');
+
+        $recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetasForReport($user, $filtros);
+
+        $arrayRecetas = array();
+
+        if (!empty($recetas)) {
+
+            foreach($recetas as $receta){
+
+                $arrayReceta = array();
+
+                $url = $this->generateUrl('verReceta', array('id' => $receta->getId()));
+
+                $arrayReceta["id"] = $receta->getId();
+                $arrayReceta["nombre"] = '<a href="'.$url.'">'.$receta->getNombre().'</a>';
+                $arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
+                $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
+//                $arrayReceta["calorias"] = $receta->getCalorias(); //TODO
+                $arrayReceta["calorias"] = "bocha";
+//                $arrayReceta["calificacion"] = $receta->getCalificacion();
+
+                $arrayRecetas[] = $arrayReceta;
+            }
+
+        }
+
+        return new JsonResponse($arrayRecetas);
+    }
+
     /**
      * @Route("/verReceta/{id}", name="verReceta")
      */

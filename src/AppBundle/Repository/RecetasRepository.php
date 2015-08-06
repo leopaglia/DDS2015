@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Constants\ReportConstants;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\Expr\Join as ExprJoin;
@@ -21,8 +22,7 @@ class RecetasRepository extends EntityRepository{
      * @param bool $hydrateArray
      * @return array
      */
-    public function getRecetasByFilters ($arrayFiltros, $ignoredUser = null, $offset=0, $limit=0, $hydrateArray = false)
-    {
+    public function getRecetasByFilters ($arrayFiltros, $ignoredUser = null, $offset=0, $limit=0, $hydrateArray = false){
 
         $qb = $this->buildQueryByFilters($arrayFiltros, $ignoredUser);
 
@@ -34,15 +34,20 @@ class RecetasRepository extends EntityRepository{
     }
 
     /**
+     * @param User $user
+     * @param mixed $arrayFiltros
+     * @param int $offset
      * @param int $limit
      * @param bool $hydrateArray
      * @return array
      */
-    public function getTopRecetas ($limit=0, $hydrateArray = false)
-    {
-        $qb = $this->buildQueryByMostViews();
+    public function getRecetasForReport ($user, $arrayFiltros, $offset=0, $limit=0, $hydrateArray = false){
 
-        $qb->setMaxResults($limit);
+        $qb = $this->buildQueryForReport($arrayFiltros, $user);
+
+        if ($offset != 0 || $limit != 0){
+            $qb->setFirstResult($offset)->setMaxResults($limit);
+        }
 
         return $hydrateArray ? $qb->getQuery()->getArrayResult() : $qb->getQuery()->getResult();
     }
@@ -53,41 +58,45 @@ class RecetasRepository extends EntityRepository{
      * @param bool $hydrateArray
      * @return array
      */
-    public function getTopRecetasByFilters ($filtros, $limit=0, $hydrateArray = false)
-    {
+    public function getTopRecetas ($limit = 0, $filtros = null, $hydrateArray = false){
+
         $qb = $this->buildQueryByMostViews();
 
-        $filtros = $this->trimFilters($filtros);
+        if($filtros != null){
 
-        $domingoSemana = strtotime('last sunday', strtotime('tomorrow')); //domingo de esta semana (dia 0)
-        $primerDiaMes = date('01-m-Y'); //domingo de esta semana (dia 0)
+            $filtros = $this->trimFilters($filtros);
 
-        if ($this->validFilter($filtros['rango'])){
+            if ($this->validFilter($filtros['rango'])){
 
-            if($filtros['rango'] == RangeConstants::SEMANA){
-                $qb ->andWhere($qb->expr()->gte("h.fecha", ":semana"))
-                    ->setParameter("semana",$domingoSemana);
+                $domingoSemana = strtotime('last sunday', strtotime('tomorrow')); //domingo de esta semana (dia 0)
+                $primerDiaMes = date('01-m-Y');
+
+                if($filtros['rango'] == RangeConstants::SEMANA){
+                    $qb ->andWhere($qb->expr()->gte("h.fecha", ":semana"))
+                        ->setParameter("semana",$domingoSemana);
+                }
+
+                if($filtros['rango'] == RangeConstants::MES){
+                    $qb ->andWhere($qb->expr()->gte("h.fecha", ":mes"))
+                        ->setParameter("mes", $primerDiaMes);
+                }
+
             }
 
-            if($filtros['rango'] == RangeConstants::MES){
-                $qb ->andWhere($qb->expr()->gte("h.fecha", ":mes"))
-                    ->setParameter("mes", $primerDiaMes);
+            if ($this->validFilter($filtros['dificultad'])){
+
+                $qb ->andWhere($qb->expr()->eq("r.dificultad", ":dificultad"))
+                    ->setParameter("dificultad", $filtros['dificultad']);
+
             }
 
-        }
+            if ($this->validFilter($filtros['sexo'])){
 
-        if ($this->validFilter($filtros['dificultad'])){
+                $qb->innerJoin("AppBundle:Usuario", "u", 'WITH', 'h.idusuario = u.dni');
+                $qb ->andWhere($qb->expr()->eq("u.sexo", ":sexo"))
+                    ->setParameter("sexo", $filtros['sexo']);
 
-            $qb ->andWhere($qb->expr()->eq("r.dificultad", ":dificultad"))
-                ->setParameter("dificultad", $filtros['dificultad']);
-
-        }
-
-        if ($this->validFilter($filtros['sexo'])){
-
-            $qb->innerJoin("AppBundle:Usuario", "u", 'WITH', 'h.idusuario = u.dni');
-            $qb ->andWhere($qb->expr()->eq("u.sexo", ":sexo"))
-                ->setParameter("sexo", $filtros['sexo']);
+            }
 
         }
 
@@ -163,6 +172,59 @@ class RecetasRepository extends EntityRepository{
     }
 
     /**
+     * @param $filtros
+     * @param User $user
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    private function buildQueryForReport($filtros, $user){
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb ->select("r")
+            ->from("AppBundle:Receta", "r")
+            ->innerJoin("AppBundle:Historial", "h", 'WITH', 'h.idreceta = r.id')
+            ->orderBy("r.nombre")
+        ;
+
+        $filtros = $this->trimFilters($filtros);
+
+        if ($this->validFilter($filtros['tipoReporte'])){
+
+            if($filtros['tipoReporte'] == ReportConstants::CONSULTADAS){
+                //TODO seran todas las consultadas? y en preferidas las mas consultadas?
+                $qb->andWhere($qb->expr()->eq("h.idusuario", ":dni"));
+                $qb->setParameter("dni", $user->getDni());
+            }
+
+            if($filtros['tipoReporte'] == ReportConstants::PREFERIDAS){
+                //TODO mas visitadas?? es lo mismo que consultadas
+                $qb->andWhere($qb->expr()->eq("h.idusuario", ":dni"));
+                $qb->setParameter("dni", $user->getDni());
+            }
+
+            if($filtros['tipoReporte'] == ReportConstants::PROPUESTAS){
+                //TODO creadas por el usuario
+            }
+
+        }
+
+        if ($this->validFilter($filtros['fechaDesde'])){
+
+            $qb ->andWhere($qb->expr()->gte("h.fecha", ":fechaDesde"))
+                ->setParameter("fechaDesde", $filtros['fechaDesde']);
+
+        }
+
+        if ($this->validFilter($filtros['fechaHasta'])){
+
+            $qb ->andWhere($qb->expr()->lte("h.fecha", ":fechaHasta"))
+                ->setParameter("fechaHasta", $filtros['fechaHasta']);
+
+        }
+
+        return $qb;
+    }
+
+    /**
      * @return \Doctrine\ORM\QueryBuilder
      */
     private function buildQueryByMostViews (){
@@ -180,7 +242,7 @@ class RecetasRepository extends EntityRepository{
 
     private function validFilter($filter){
 
-        return !empty($filter) && trim($filter) != "";
+        return $filter != null && !empty($filter) && trim($filter) != "";
 
     }
 

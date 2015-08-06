@@ -1,0 +1,153 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+
+    <div class="panel panel-primary">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">Filtros de B&uacute;squeda</h3>
+        </div>
+
+        <div class="panel-body">
+
+            <div style="float:left; width:50%;">
+
+                <div class="form-group">
+                    <label for="tipoReporte" class="control-label col-sm-3">Mis recetas:</label>
+                    <div class="col-sm-7">
+                        <input id="tipoReporte" type="radio" name="tipoReporte" value="1" checked> Consultadas
+                        <input id="tipoReporte" type="radio" name="tipoReporte" value="2"> Preferidas
+                        <input id="tipoReporte" type="radio" name="tipoReporte" value="3"> Propuestas
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div style="float:right; width:50%;">
+
+                    <div class="form-group">
+                    <label for="fecha" class="control-label col-sm-3">Fecha:</label>
+                    <div id="fecha" class="col-sm-7">
+                        <div class="col-sm-3">
+                            <input id="fechaDesde" type="text" class="form-control" name="fechaDesde" placeholder="Desde">
+                        </div>
+                        <div class="col-sm-3">
+                            <input id="fechaHasta" type="text" class="form-control" name="fechaHasta" placeholder="Hasta">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-footer" style="overflow: hidden;">
+            <input type="button" id="buscar" value="Buscar" class="btn btn-default" style="float: right;">
+            <input type="button" id="limpiar" value="Limpiar" class="btn btn-default" style="float: right; margin-right: 10px;">
+        </div>
+
+
+    </div>
+
+
+	<div class="panel panel-default">
+
+		<div class="panel-heading">
+    		<h3 class="panel-title">Reporte</h3>
+  		</div>
+  					
+		<div class="panel-body">
+			<table id="tablaRecetas" class="table table-bordered">	
+				<thead>
+					<tr>
+					  <th>Nombre</th>
+					  <th>Temporada</th>	
+					  <th>Dificultad</th>
+					  <th>Calor&iacute;as por porci&oacute;n</th>	
+					  {#<th>Calificaci&oacute;n</th>#}
+					</tr>
+			   </thead>
+			</table>
+		</div>
+		
+	</div>	
+
+{% endblock body_container_main%}	
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+//
+//			var starTag = "<input name='star' type='radio'class='star' disabled='disabled'>";
+//			var checkedStarTag = "<input name='star' type='radio'class='star' checked='checked' disabled='disabled'>";
+//
+//
+//			var printStars = function(data){
+//
+//				var localAux = '';
+//
+//                var i;
+//                var j;
+//
+//                for(i = 1; i < data; i++) {
+//                    localAux = localAux + starTag;
+//                }
+//
+//                localAux = localAux+checkedStarTag;
+//
+//				for(j = 0; j < (5-i); j++)
+//					localAux = localAux+starTag;
+//
+//				return localAux;
+//			}
+
+			var table = $("#tablaRecetas").DataTable({
+							"dom" : 't',
+							"autoWidth" : true,
+					        "columns": [
+					                    { "data": "nombre"},
+					                    { "data": "temporada" },
+					                    { "data": "dificultad" },
+					                    { "data": "calorias" },
+// 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
+//										{ "data": "calificacion"}, //hasta arreglar el plugin
+					                ]
+            });
+
+			$('#buscar').click(function() {
+
+                app.showLoading("Buscando recetas");
+
+				 $.ajax({
+						type: 'POST',
+						data:{
+                            'tipoReporte' : $("#tipoReporte").val(),
+                            'fechaDesde' : $("#fechaDesde").val(),
+                            'fechaHasta' : $("#fechaHasta").val()
+                        },
+						url: "{{ path('generarReporte') }}"
+					}).success(function(data, textStatus, jqXHR){
+
+                        app.hideLoading();
+						table.clear();
+						table.rows.add(data).draw();
+
+					});
+
+			});
+
+
+
+
+        });
+
+	</script>		
+
+{% endblock body_js %}
+

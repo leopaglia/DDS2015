@@ -52,7 +52,7 @@ class EstadisticasController extends BasicController{
         $filtros['sexo'] = $request->request->get('sexo');
         $filtros['dificultad'] = $request->request->get('dificultad');
 
-        $recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getTopRecetasByFilters($filtros);
+        $recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getTopRecetas(null, $filtros);
 
         $arrayRecetas = array();
 
