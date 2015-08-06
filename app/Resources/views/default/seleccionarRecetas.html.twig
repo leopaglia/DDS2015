@@ -192,7 +192,7 @@
 
 			$('#buscar').click(function() {
 
-//                app.showLoading("Buscando recetas");
+                app.showLoading("Buscando recetas");
 
 				 $.ajax({
 						type: 'POST',
@@ -206,7 +206,7 @@
 						url: "{{ path('buscarRecetas') }}"
 					}).success(function(data, textStatus, jqXHR){
 
-//                        app.hideLoading();
+                        app.hideLoading();
 						table.clear();
 						table.rows.add(data).draw();
 

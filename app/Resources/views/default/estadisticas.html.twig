@@ -1,0 +1,164 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+
+    <div class="panel panel-primary">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">Filtros de B&uacute;squeda</h3>
+        </div>
+
+        <div class="panel-body">
+
+            <div style="float:left; width:50%;">
+
+                <div class="form-group">
+                    <label for="rango" class="control-label col-sm-3">Las mas elegidas de:</label>
+                    <div class="col-sm-9">
+                        <select id="rango" type="text" class="form-control col-lg-2" name="rango">
+                            <option value="1">Esta semana</option>
+                            <option value="2">Este mes</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sexo" class="control-label col-sm-3"> Sexo:</label>
+                    <div class="col-sm-9">
+                        <select id="sexo" type="text" class="form-control col-lg-2" name="sexo">
+                            <option value="" selected>Cualquier sexo</option>
+                            <option value="1">Masculino</option>
+                            <option value="2">Femenino</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="float:right; width:50%;">
+
+                <div class="form-group">
+                    <label for="dificultad" class="control-label col-sm-3">Dificultad:</label>
+                    <div class="col-sm-9">
+                        <select id="dificultad" type="text" class="form-control col-lg-2" name="dificultad">
+                            <option value="" selected>Cualquier Dificultad</option>
+                            {% for dificultad in data.dificultades %}
+                                <option value="{{ dificultad.id }}">{{ dificultad.descripcion }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-footer" style="overflow: hidden;">
+            <input type="button" id="buscar" value="Buscar" class="btn btn-default" style="float: right;">
+            <input type="button" id="limpiar" value="Limpiar" class="btn btn-default" style="float: right; margin-right: 10px;">
+        </div>
+
+
+    </div>
+
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">Seleccionar Receta</h3>
+        </div>
+
+        <div class="panel-body">
+            <table id="tablaRecetas" class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Dificultad</th>
+                    <th>Visitas</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+    </div>
+
+
+
+    <div class="panel panel-default" style="width: 30%;">
+
+        <div class="panel-heading">
+            <h3 class="panel-title">Ranking</h3>
+        </div>
+
+        <div class="panel-body">
+            <table id="tablaRanking" class="table table-bordered">
+                <tr>
+                    <th>Receta</th>
+                    <th>Visitas</th>
+                <tr>
+                    {% for t in data.ranking %}
+                <tr>
+                    <td><a href="{{ t.receta.url }}">{{ t.receta.nombre }}</a></td>
+                    <td>{{ t.visitas }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+    </div>
+
+{% endblock body_container_main%}
+
+{% block body_js %}
+
+    {{ parent() }}
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            var table = $("#tablaRecetas").DataTable({
+                "dom" : 't',
+                "autoWidth" : true,
+                "order": [[2, 'desc']], //sort by views
+                "ordering": false, //disable manual sorting
+                "columns": [
+                    { "data": "nombre"},
+                    { "data": "dificultad" },
+                    { "data": "visitas"},
+
+                ]
+            });
+
+            $('#buscar').click(function() {
+
+                app.showLoading("Buscando recetas");
+
+                $.ajax({
+                    type: 'POST',
+                    data:{
+                        'rango' : $("#rango").val(),
+                        'dificultad' : $("#dificultad").val(),
+                        'sexo' : $("#sexo").val()
+                    },
+                    url: "{{ path('getEstadisticasRecetas') }}"
+                }).success(function(data, textStatus, jqXHR){
+
+                    app.hideLoading();
+                    table.clear();
+                    table.rows.add(data).draw();
+
+                });
+
+            });
+
+
+
+
+        });
+
+    </script>
+
+{% endblock body_js %}
+

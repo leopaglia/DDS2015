@@ -5,8 +5,8 @@
 	<style type="text/css">
 		
 		#basicFormPanel{
-			min-width: 350px !important;
-			max-width: 600px !important;
+			min-width: 800px !important;
+			max-width: 800px !important;
 			margin-left: auto ;
   			margin-right: auto ;
 		}
@@ -15,7 +15,7 @@
 			margin-left: 85% ;
 		}
 		
-		.inline{
+/*		.inline{
 			display: inline-block;
 		}
 		
@@ -36,6 +36,7 @@
 			margin: 10px;
 			border: 1px solid;
 		}
+*/
 
 	</style>
 {% endblock %}
@@ -73,8 +74,22 @@
 								</select>   
 							</div>
 						{% endif %}
-						
-						{% if field.type == "multiselect" %}
+
+                        {% if field.type == "checklist" %}
+                            <div class="form-group">
+                                <label for="{{ field.idName }}">{{ field.label }}:</label>
+                                <table id="{{ field.idName }}" name="{{ field.idName }}" class="table table-hover">
+                                    {% for option in field.options %}
+                                        <tr>
+                                            <td align="left">{{ option.name }}</td>
+                                            <td align="center"><input type="checkbox" value="{{ option.value }}" /></td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        {% endif %}
+					{#
+						{% if field.type == "multiselect" %} <!-- FIXME -->
 							<div class="form-group">
 							    <label for="{{ field.idName }}">{{ field.label }}:</label>
 							    <select multiple="multiple" id="{{ field.idName }}" name="{{ field.idName }}" class="form-control multiselect">
@@ -100,7 +115,7 @@
 							</div>
 						
 						{% endif %}
-						
+					#}
 				    {% endfor %}
 				 </div>
 				    
@@ -140,6 +155,8 @@
 				active: false
 				
 			});
+
+/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             //MULTISELECT INIT
 
@@ -184,23 +201,28 @@
 
             //END MULTISELECT INIT
 
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
             //WRITE DATA
 
             {% for set in fieldsets %}
                 {% for field in set.fields %}
 
-                    {% if field.value is defined %}
+                    {% if field.type == "input" or field.type == "select" %}
+                        {% if field.value is defined %}$("#{{ field.idName }}").val( "{{ field.value }}" );{% endif %}
+                    {% endif %}
 
-                        {% if field.type == "input" or field.type == "select" %}
-                        $("#{{ field.idName }}").val( "{{ field.value }}" );
-                        {% endif %}
-
+                    {% if field.type == "checklist" %}
+                        {% for option in field.options %}
+                            {% if option.checked %}
+                                $("#{{ field.idName }}").find('input[value="{{ option.value }}"]').prop('checked', true); //checkeo los que vienen con el atributo checked en true
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
 
                 {% endfor %}
             {% endfor %}
-
 
             //END WRITE DATA
 
@@ -214,9 +236,16 @@
 					
 						{% if (field.type == "input") or (field.type == "select") %}
 							var {{ field.idName }} = $("#{{ field.idName }}").val();
-						{% endif %}	
-						
-					{% endfor %}
+						{% endif %}
+
+                        {% if (field.type == "checklist") %}
+                            var {{ field.idName }} = [];
+                            $("#{{ field.idName }}").find('input[type="checkbox"]:checked').each(function () {
+                                {{ field.idName }}.push($(this).val());
+                            });
+                        {% endif %}
+
+                    {% endfor %}
 				{% endfor %}
 
 			    $.ajax({

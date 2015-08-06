@@ -31,18 +31,23 @@
 					</div>
 					{% block user_info %}
 						{% if app.user %}
-	 		              	<div>
-								<ul id="user_info">
-								    <li><a href="#">{{ app.user.username }}</a>
-								       <ul>
-								        <li><a href="{{ path("profile") }}">Mi Perfil</a></li>
-								        <li><a href="#">Mis Grupos</a></li>
-								        <li><a href="{{ path("logout") }}">Cerrar Sesi&oacuten</a></li>
-								       </ul>
-								    </li>
-								</ul>
-							</div>	
-		              	{% endif %}	
+                            {% block userMenu %}
+
+                                <div>
+                                    <ul id="user_info">
+                                        <li><a href="#">{{ app.user.username }}</a>
+                                            <ul>
+                                                <li><a href="{{ path("profile") }}">Mi Perfil</a></li>
+                                                <li><a href="{{ path("myGroups") }}">Mis Grupos</a></li>
+                                                <li><a href="{{ path("myRecipes") }}">Mis Recetas</a></li>
+                                                <li><a href="{{ path("logout") }}">Cerrar Sesi&oacuten</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            {% endblock userMenu %}
+		              	{% endif %}
 	              	{% endblock %}
 					
 					{% block menu %}

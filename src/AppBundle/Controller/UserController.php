@@ -14,6 +14,8 @@ use AppBundle\Entity\Usuario;
 use AppBundle\Entity\CondicionesDeSalud;
 use AppBundle\Entity\Rutina;
 
+use AppBundle\Repository\GenericRepository as GenericRepository;
+
 class UserController extends BasicController{
 
 	/**
@@ -44,7 +46,7 @@ class UserController extends BasicController{
                 $arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
             }
             foreach ($condiciones as $c){
-                $arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId());
+                $arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId(), "checked" => false);
             }
             foreach ($rutinas as $r){
                 $arrayRutinas[] = array("name" => $r->getNombre(), "value" => $r->getId());
@@ -54,6 +56,22 @@ class UserController extends BasicController{
 
             $dni = $this->getUser();
             $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+
+            //Datos del usuario (Para campo checked de los checklist)
+
+            $condicionesPresentes = $user->getIdcondiciones()->getValues(); //array de objetos CondicionesDeSalud
+
+            foreach($condiciones as $cnd){
+
+                if(in_array($cnd, $condicionesPresentes)){ //busco la condicion y pongo en true el campo checked en el array que voy a mandar al html
+
+                    $index = array_search(array("name" => $cnd->getNombre(), "value" => $cnd->getId(), "checked" => false), $arrayCondiciones);
+
+                    if($index !== false) $arrayCondiciones[$index]["checked"] = true;
+
+                }
+
+            }
 
 
      	//Vista
@@ -73,7 +91,7 @@ class UserController extends BasicController{
      			)),
      			
      			array("title" => "Condiciones Preexistentes", "fields" => array(
-     					array("label" => "Condiciones preexistentes", "type" => "multiselect", "idName" => "condiciones", "options" => $arrayCondiciones),
+     					array("label" => "Condiciones preexistentes", "type" => "checklist", "idName" => "condiciones", "options" => $arrayCondiciones),
      			)),
 
      			
@@ -98,10 +116,14 @@ class UserController extends BasicController{
      */
     public function updateProfileAction(Request $request){
 
+//        $genericRepository = GenericRepository::getInstance("", $this->getDoctrine());
     	$em = $this->getDoctrine()->getManager();
+        $session = $request->getSession();
     	
     	$dni = $this->getUser();
     	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+
+        $allCondiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
     	
     	$nombre = $request->request->get("nombre");
     	$apellido = $request->request->get("apellido");
@@ -127,23 +149,39 @@ class UserController extends BasicController{
 	    		$user->setRutina($this->getDoctrine()->getRepository("AppBundle:Rutina")->find($rutina));
     		if(!empty($complexion))
 	    		$user->setComplexion($this->getDoctrine()->getRepository("AppBundle:Complexion")->find($complexion));
-    		if(!empty($condiciones))
-	    		foreach($condiciones as $condicion)
-		    		$user->addCondicion($this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicion[0])); //FIXME?? capaz no //TESTME lel
-		    	
+
+            //borro todas las condiciones
+            foreach($allCondiciones as $c){
+                if ($user->getIdcondiciones()->contains($c) ) {
+                    $user->removeCondicion($c);
+                    $c->removeIdusuario($user);
+                }
+            }
+            //agrego las que vienen del form
+    		if(!empty($condiciones)){
+                foreach($condiciones as $condicionId){
+
+                    $condicion = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicionId);
+                    $user->addCondicion($condicion);
+                    $condicion->addIdusuario($user);
+
+                }
+            }
+
 	    	$em->persist($user);
 	    	$em->flush();
     			
     	}catch(\Exception $e){
     		$em->rollback();
 
-            $session = $this->getRequest()->getSession();
-            $session->getFlashBag()->add('error', "[DEGUG]".$e->getMessage());
+            $session->getFlashBag()->add('error', "[DEGUG] ".$e->getMessage());
 
         }
     	
     	$em->commit();
-    	
+
+        $session->getFlashBag()->add('notice', "Perfil actualizado exitosamente");
+
     	return new Response($this->generateUrl("modifyProfile")); //Reload to
     	
     }
@@ -178,10 +216,18 @@ class UserController extends BasicController{
     }
 
     /**
-     * @Route("/crearGrupo", name="createGroup")
+     * @Route("/misGrupos", name="myGroups")
      */
     public function crearGrupoAction(){
-    	//return $this->render("default/perfil.html.twig");
+    	return $this->render("default/perfil.html.twig");
     }
+
+    /**
+     * @Route("/misRecetas", name="myRecipes")
+     */
+    public function mostrarRecetasAction(){
+        return $this->render("default/perfil.html.twig");
+    }
+
 
 }

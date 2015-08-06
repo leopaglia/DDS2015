@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Session;
 
 use AppBundle\Entity\Usuario;
 use AppBundle\Entity\Receta;
+use AppBundle\Entity\Historial;
 
 class RecetasController extends BasicController{
 
@@ -46,7 +47,7 @@ class RecetasController extends BasicController{
         $filtros['caloriasDesde'] = $request->request->get('caloriasDesde');
         $filtros['caloriasHasta'] = $request->request->get('caloriasHasta');
 
-    	$recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetas($filtros, $user);
+    	$recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetasByFilters($filtros, $user);
     	
 		$arrayRecetas = array();
 
@@ -78,7 +79,9 @@ class RecetasController extends BasicController{
      * @Route("/verReceta/{id}", name="verReceta")
      */
     public function verRecetaAction($id){
-    	 
+
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($this->getUser());
     	$receta = $this->getDoctrine()->getRepository('AppBundle:Receta')->find($id);
     	 
     	$arrayReceta = array();
@@ -87,7 +90,12 @@ class RecetasController extends BasicController{
     	$arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
     	$arrayReceta["dificultad"] = $receta->getDificultad();
     	$arrayReceta["calorias"] = "muchas";
-    	$arrayReceta["calificacion"] = $receta->getCalificacion();	
+    	$arrayReceta["calificacion"] = $receta->getCalificacion();
+
+        $historial = new Historial($user, $receta);
+
+        $em->persist($historial);
+        $em->flush();
     	 
     	return $this->render("default/receta.html.twig", $arrayReceta);
     }
@@ -150,8 +158,8 @@ class RecetasController extends BasicController{
     	
     	$em = $this->getDoctrine()->getManager();
     	 
-//    	$dni = $this->getUser();
-//    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+    	$dni = $this->getUser();
+    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
     	
     	$receta = new Receta();
     	 
@@ -182,14 +190,12 @@ class RecetasController extends BasicController{
                 foreach($condimentos as $condimento)
                     $receta->addIdcondimento($this->getDoctrine()->getRepository("AppBundle:Condimento")->find($condimento));
 
-    		$em->persist($receta);
-    		$em->flush();
-    		
-//    		$user->addReceta($receta);
-    		
-//    		$em->persist($user);
-//    		$em->flush();
-    			 
+            $user->addIdreceta($receta);
+            $receta->addIdusuario($user);
+
+            $em->persist($receta);
+            $em->flush();
+
     	}catch(\Exception $e){
     		$em->rollback();
     		throw($e);

@@ -18,8 +18,9 @@ class DefaultController extends Controller
      */
     public function indexAction(){
 
-    	return $this->render('default/index.html.twig', array("title" 				  => "DDS 2015",
-    														  "seleccionarRecetasURL" => "seleccionarRecetas",
+    	return $this->render('default/index.html.twig', array( "title"                 => "DDS 2015",
+                                                     "seleccionarRecetasURL" => "seleccionarRecetas",
+                                                     "estadisticasURL"       => "estadisticas"
     	));
     }    
 }
