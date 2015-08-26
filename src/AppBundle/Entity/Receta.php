@@ -22,23 +22,79 @@ class Receta
     /**
      * @var integer
      *
-     * @ORM\Column(name="fotos", type="integer", nullable=true)
+     * @ORM\Column(name="calificacion", type="integer", nullable=true)
      */
-    private $fotos;
+    private $calificacion;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="procedimiento", type="string", length=45, nullable=true)
+     * @ORM\Column(name="paso1", type="string", length=255, nullable=false)
      */
-    private $procedimiento;
+    private $paso1;
 
     /**
-     * @var integer
+     * @var string
      *
-     * @ORM\Column(name="calificacion", type="integer", nullable=true)
+     * @ORM\Column(name="paso2", type="string", length=255, nullable=true)
      */
-    private $calificacion;
+    private $paso2;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="paso3", type="string", length=255, nullable=true)
+     */
+    private $paso3;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="paso4", type="string", length=255, nullable=true)
+     */
+    private $paso4;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="paso5", type="string", length=255, nullable=true)
+     */
+    private $paso5;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foto1", type="string", length=255, nullable=true)
+     */
+    private $foto1;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foto2", type="string", length=255, nullable=true)
+     */
+    private $foto2;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foto3", type="string", length=255, nullable=true)
+     */
+    private $foto3;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foto4", type="string", length=255, nullable=true)
+     */
+    private $foto4;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="foto5", type="string", length=255, nullable=true)
+     */
+    private $foto5;
 
     /**
      * @var integer
@@ -72,21 +128,6 @@ class Receta
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
-     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Ingrediente", inversedBy="idreceta")
-     * @ORM\JoinTable(name="ingrediente_receta",
-     *   joinColumns={
-     *     @ORM\JoinColumn(name="idReceta", referencedColumnName="id")
-     *   },
-     *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="idIngrediente", referencedColumnName="id")
-     *   }
-     * )
-     */
-    private $idingrediente;
-
-	  /**
-     * @var \Doctrine\Common\Collections\Collection
-     *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idreceta")
      * @ORM\JoinTable(name="receta_usuario",
      *   joinColumns={
@@ -98,7 +139,7 @@ class Receta
      * )
      */
     private $idusuario;
-	
+
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
@@ -115,13 +156,28 @@ class Receta
     private $idcondimento;
 
     /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Ingrediente", inversedBy="idreceta")
+     * @ORM\JoinTable(name="ingrediente_receta",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="idReceta", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="idIngrediente", referencedColumnName="id")
+     *   }
+     * )
+     */
+    private $idingrediente;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
-		$this->idusuario = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->idingrediente = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->idusuario = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idcondimento = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->idingrediente = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
 
@@ -149,52 +205,6 @@ class Receta
     }
 
     /**
-     * Set fotos
-     *
-     * @param integer $fotos
-     * @return Receta
-     */
-    public function setFotos($fotos)
-    {
-        $this->fotos = $fotos;
-
-        return $this;
-    }
-
-    /**
-     * Get fotos
-     *
-     * @return integer 
-     */
-    public function getFotos()
-    {
-        return $this->fotos;
-    }
-
-    /**
-     * Set procedimiento
-     *
-     * @param string $procedimiento
-     * @return Receta
-     */
-    public function setProcedimiento($procedimiento)
-    {
-        $this->procedimiento = $procedimiento;
-
-        return $this;
-    }
-
-    /**
-     * Get procedimiento
-     *
-     * @return string 
-     */
-    public function getProcedimiento()
-    {
-        return $this->procedimiento;
-    }
-
-    /**
      * Set calificacion
      *
      * @param integer $calificacion
@@ -215,6 +225,236 @@ class Receta
     public function getCalificacion()
     {
         return $this->calificacion;
+    }
+
+    /**
+     * Set paso1
+     *
+     * @param string $paso1
+     * @return Receta
+     */
+    public function setPaso1($paso1)
+    {
+        $this->paso1 = $paso1;
+
+        return $this;
+    }
+
+    /**
+     * Get paso1
+     *
+     * @return string 
+     */
+    public function getPaso1()
+    {
+        return $this->paso1;
+    }
+
+    /**
+     * Set paso2
+     *
+     * @param string $paso2
+     * @return Receta
+     */
+    public function setPaso2($paso2)
+    {
+        $this->paso2 = $paso2;
+
+        return $this;
+    }
+
+    /**
+     * Get paso2
+     *
+     * @return string 
+     */
+    public function getPaso2()
+    {
+        return $this->paso2;
+    }
+
+    /**
+     * Set paso3
+     *
+     * @param string $paso3
+     * @return Receta
+     */
+    public function setPaso3($paso3)
+    {
+        $this->paso3 = $paso3;
+
+        return $this;
+    }
+
+    /**
+     * Get paso3
+     *
+     * @return string 
+     */
+    public function getPaso3()
+    {
+        return $this->paso3;
+    }
+
+    /**
+     * Set paso4
+     *
+     * @param string $paso4
+     * @return Receta
+     */
+    public function setPaso4($paso4)
+    {
+        $this->paso4 = $paso4;
+
+        return $this;
+    }
+
+    /**
+     * Get paso4
+     *
+     * @return string 
+     */
+    public function getPaso4()
+    {
+        return $this->paso4;
+    }
+
+    /**
+     * Set paso5
+     *
+     * @param string $paso5
+     * @return Receta
+     */
+    public function setPaso5($paso5)
+    {
+        $this->paso5 = $paso5;
+
+        return $this;
+    }
+
+    /**
+     * Get paso5
+     *
+     * @return string 
+     */
+    public function getPaso5()
+    {
+        return $this->paso5;
+    }
+
+    /**
+     * Set foto1
+     *
+     * @param string $foto1
+     * @return Receta
+     */
+    public function setFoto1($foto1)
+    {
+        $this->foto1 = $foto1;
+
+        return $this;
+    }
+
+    /**
+     * Get foto1
+     *
+     * @return string 
+     */
+    public function getFoto1()
+    {
+        return $this->foto1;
+    }
+
+    /**
+     * Set foto2
+     *
+     * @param string $foto2
+     * @return Receta
+     */
+    public function setFoto2($foto2)
+    {
+        $this->foto2 = $foto2;
+
+        return $this;
+    }
+
+    /**
+     * Get foto2
+     *
+     * @return string 
+     */
+    public function getFoto2()
+    {
+        return $this->foto2;
+    }
+
+    /**
+     * Set foto3
+     *
+     * @param string $foto3
+     * @return Receta
+     */
+    public function setFoto3($foto3)
+    {
+        $this->foto3 = $foto3;
+
+        return $this;
+    }
+
+    /**
+     * Get foto3
+     *
+     * @return string 
+     */
+    public function getFoto3()
+    {
+        return $this->foto3;
+    }
+
+    /**
+     * Set foto4
+     *
+     * @param string $foto4
+     * @return Receta
+     */
+    public function setFoto4($foto4)
+    {
+        $this->foto4 = $foto4;
+
+        return $this;
+    }
+
+    /**
+     * Get foto4
+     *
+     * @return string 
+     */
+    public function getFoto4()
+    {
+        return $this->foto4;
+    }
+
+    /**
+     * Set foto5
+     *
+     * @param string $foto5
+     * @return Receta
+     */
+    public function setFoto5($foto5)
+    {
+        $this->foto5 = $foto5;
+
+        return $this;
+    }
+
+    /**
+     * Get foto5
+     *
+     * @return string 
+     */
+    public function getFoto5()
+    {
+        return $this->foto5;
     }
 
     /**
@@ -274,39 +514,6 @@ class Receta
     }
 
     /**
-     * Add idingrediente
-     *
-     * @param \AppBundle\Entity\Ingrediente $idingrediente
-     * @return Receta
-     */
-    public function addIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
-    {
-        $this->idingrediente[] = $idingrediente;
-
-        return $this;
-    }
-
-    /**
-     * Remove idingrediente
-     *
-     * @param \AppBundle\Entity\Ingrediente $idingrediente
-     */
-    public function removeIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
-    {
-        $this->idingrediente->removeElement($idingrediente);
-    }
-
-    /**
-     * Get idingrediente
-     *
-     * @return \Doctrine\Common\Collections\Collection 
-     */
-    public function getIdingrediente()
-    {
-        return $this->idingrediente;
-    }
-
-	    /**
      * Add idusuario
      *
      * @param \AppBundle\Entity\Usuario $idusuario
@@ -338,7 +545,7 @@ class Receta
     {
         return $this->idusuario;
     }
-	
+
     /**
      * Add idcondimento
      *
@@ -370,5 +577,38 @@ class Receta
     public function getIdcondimento()
     {
         return $this->idcondimento;
+    }
+
+    /**
+     * Add idingrediente
+     *
+     * @param \AppBundle\Entity\Ingrediente $idingrediente
+     * @return Receta
+     */
+    public function addIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
+    {
+        $this->idingrediente[] = $idingrediente;
+
+        return $this;
+    }
+
+    /**
+     * Remove idingrediente
+     *
+     * @param \AppBundle\Entity\Ingrediente $idingrediente
+     */
+    public function removeIdingrediente(\AppBundle\Entity\Ingrediente $idingrediente)
+    {
+        $this->idingrediente->removeElement($idingrediente);
+    }
+
+    /**
+     * Get idingrediente
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdingrediente()
+    {
+        return $this->idingrediente;
     }
 }

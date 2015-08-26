@@ -12,25 +12,39 @@ use AppBundle\Entity\Usuario as User;
 use AppBundle\Constants\RangeConstants;
 use Symfony\Component\Validator\Constraints\DateTime;
 
-class RecetasRepository extends EntityRepository{
+
+class RecetasRepository extends EntityRepository implements IVisitableRepository{
+
+    public $user;
+    public $qb;
 
     /**
      * @param mixed $arrayFiltros
-     * @param User $ignoredUser
+     * @param User $user
      * @param int $offset
      * @param int $limit
      * @param bool $hydrateArray
      * @return array
      */
-    public function getRecetasByFilters ($arrayFiltros, $ignoredUser = null, $offset=0, $limit=0, $hydrateArray = false){
+    public function getRecetasByFilters ($arrayFiltros, $user, $offset=0, $limit=0, $hydrateArray = false){
 
-        $qb = $this->buildQueryByFilters($arrayFiltros, $ignoredUser);
+        $this->user = $user;
+
+        //el 2do parametro hace que ignore o no las recetas que el usuario ya tiene en el perfil
+        $this->qb = $this->buildQueryByFilters($arrayFiltros, true);
 
         if ($offset != 0 || $limit != 0){
-            $qb->setFirstResult($offset)->setMaxResults($limit);
+            $this->qb->setFirstResult($offset)->setMaxResults($limit);
         }
 
-        return $hydrateArray ? $qb->getQuery()->getArrayResult() : $qb->getQuery()->getResult();
+        $enfermedadesVisitor = new EnfermedadesVisitor();
+        $this->qb = $this->accept($enfermedadesVisitor); //agrega filtros segun las enfermedades del usuario
+
+        return $hydrateArray ? $this->qb->getQuery()->getArrayResult() : $this->qb->getQuery()->getResult();
+    }
+
+    public function accept (EnfermedadesVisitor $visitor){
+        return $visitor->visit($this);
     }
 
     /**
@@ -107,10 +121,10 @@ class RecetasRepository extends EntityRepository{
 
     /**
      * @param $filtros
-     * @param User $ignoredUser
+     * @param Boolean $ignoreUser
      * @return \Doctrine\ORM\QueryBuilder
      */
-    private function buildQueryByFilters($filtros, $ignoredUser){
+    private function buildQueryByFilters($filtros, $ignoreUser){
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->select("r")
@@ -156,10 +170,9 @@ class RecetasRepository extends EntityRepository{
 
         }
 
-        //Para que no traiga las recetas que ya tiene en el perfil
-        if($ignoredUser != null){
+        if($ignoreUser){
 
-            $arrayRecetas = $ignoredUser->getIdreceta()->toArray();
+            $arrayRecetas = $this->user->getIdreceta()->toArray();
 
             foreach($arrayRecetas as $receta){
                 $qb ->andWhere($qb->expr()->neq("r.id", ":idAIgnorar"))

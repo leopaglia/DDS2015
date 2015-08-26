@@ -144,6 +144,18 @@ class RecetasController extends BasicController{
     	$arrayReceta["calorias"] = "muchas";
     	$arrayReceta["calificacion"] = $receta->getCalificacion();
 
+        $arrayReceta["paso1"] = $receta->getPaso1();
+        $arrayReceta["paso2"] = $receta->getPaso2();
+        $arrayReceta["paso3"] = $receta->getPaso3();
+        $arrayReceta["paso4"] = $receta->getPaso4();
+        $arrayReceta["paso5"] = $receta->getPaso5();
+
+        $arrayReceta["foto1"] = $receta->getFoto1();
+        $arrayReceta["foto2"] = $receta->getFoto2();
+        $arrayReceta["foto3"] = $receta->getFoto3();
+        $arrayReceta["foto4"] = $receta->getFoto4();
+        $arrayReceta["foto5"] = $receta->getFoto5();
+
         $historial = new Historial($user, $receta);
 
         $em->persist($historial);
