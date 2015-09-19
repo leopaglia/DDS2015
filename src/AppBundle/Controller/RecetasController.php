@@ -176,7 +176,17 @@ class RecetasController extends BasicController{
     	$arrayIngredientes = array();
     	$arrayCondimentos = array();
     	$arrayClasificaciones = array();
-    	
+
+        $dificultades = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
+        $temporadas = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
+
+        foreach ($dificultades as $d){
+            $arrayDificultades[] = array("name" => $d->getDescripcion(), "value" => $d->getId());
+        }
+        foreach ($temporadas as $t){
+            $arrayTemporadas[] = array("name" => $t->getNombre(), "value" => $t->getId());
+        }
+
     	//vista
     	
 		$fieldsets = array(
@@ -188,15 +198,15 @@ class RecetasController extends BasicController{
      			)),
 				
 				array("title" => "Clasificacion", "fields" => array(
-						array("label" => "Clasificacion", "type" => "multiselect", "idName" => "clasificacion", "options" => $arrayClasificaciones),
+						array("label" => "Clasificacion", "type" => "select", "idName" => "clasificacion", "options" => $arrayClasificaciones),
 				)),
      					
      			array("title" => "Ingredientes", "fields" => array(
-     					array("label" => "Ingredientes", "type" => "multiselect", "idName" => "ingredientes", "options" => $arrayIngredientes),
+     					array("label" => "Ingredientes", "type" => "select", "idName" => "ingredientes", "options" => $arrayIngredientes),
      			)),
 				
 				array("title" => "Condimentos", "fields" => array(
-						array("label" => "Condimentos", "type" => "multiselect", "idName" => "condimentos", "options" => $arrayCondimentos),
+						array("label" => "Condimentos", "type" => "select", "idName" => "condimentos", "options" => $arrayCondimentos),
 				)),
 
      			
@@ -241,10 +251,10 @@ class RecetasController extends BasicController{
                 $receta->setNombre($nombre);
 
     		if(!empty($dificultad))
-    			$receta->setDificultad($dificultad);
+    			$receta->setDificultad($this->getDoctrine()->getRepository("AppBundle:Dificultad")->find($dificultad));
 
     		if(!empty($temporada))
-    			$receta->setTemporada($temporada);
+    			$receta->setTemporada($this->getDoctrine()->getRepository("AppBundle:Temporada")->find($temporada));
 
      		if(!empty($ingredientes))
      			foreach($ingredientes as $ingrediente)
@@ -253,6 +263,11 @@ class RecetasController extends BasicController{
             if(!empty($condimentos))
                 foreach($condimentos as $condimento)
                     $receta->addIdcondimento($this->getDoctrine()->getRepository("AppBundle:Condimento")->find($condimento));
+
+
+            $receta->setPaso1("ASDASD");
+            $receta->setCalificacion(3);
+
 
             $user->addIdreceta($receta);
             $receta->addIdusuario($user);
@@ -267,7 +282,7 @@ class RecetasController extends BasicController{
     	 
     	$em->commit();
     	 
-    	return new Response($this->generateUrl("homepage"));
+    	return new Response($this->generateUrl("seleccionarRecetas"));
     }
 
 
@@ -281,13 +296,13 @@ class RecetasController extends BasicController{
         $idReceta = $request->request->get('id');
         $dni = $this->getUser();
 
-        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
         $receta = $this->getDoctrine()->getRepository("AppBundle:Receta")->find($idReceta);
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
 
-        $user->addIdreceta($receta);
-        $receta->addIdusuario($user);
+        $historial = new Historial($user, $receta);
+        $historial->setAceptada(1);
 
-        $em->persist($user);
+        $em->persist($historial);
         $em->flush();
 
         return new Response("");

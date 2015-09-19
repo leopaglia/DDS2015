@@ -73,7 +73,7 @@
 	  	 $('#agregar').click(function() {
 	  		
 	  	     $.ajax({
-	 		 	 type: 'POST',
+	 		 	 type: "POST",
 	 		 	 data: {'nombre' : $("#agregarUsuario").val()},
 				 url: "{{ path("findUser") }}"
 	 		 }).success(function(data, textStatus, jqXHR){

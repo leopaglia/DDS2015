@@ -135,8 +135,14 @@ class Usuario implements UserInterface, \Serializable
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct($dni, $user, $pass, $sexo, $edad)
     {
+
+        $this->dni = $dni;
+        $this->username = $user;
+        $this->password = $pass;
+        $this->sexo = #sexo;
+        $this->edad = $edad;
 		$this->idreceta = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idgrupo = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idcondiciones = new \Doctrine\Common\Collections\ArrayCollection();

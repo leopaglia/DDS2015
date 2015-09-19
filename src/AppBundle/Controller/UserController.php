@@ -198,19 +198,21 @@ class UserController extends BasicController{
 		$qb->select("u")
 			->from("AppBundle:Usuario", "u");
     	
-		if(!empty ($nombre) && trim($nombre != "")){
-			$nombre = trim($nombre);
-			$qb->andWhere($qb->expr()->andx($qb->expr()->like('u.username', ':nombre')));
-			$qb->setParameter(':nombre', '%'.$nombre.'%');
+		if(empty ($nombre) || trim($nombre == "")){
+            return new JsonResponse("");
 		}
+
+        $nombre = trim($nombre);
+        $qb->andWhere($qb->expr()->andx($qb->expr()->eq('u.username', ':nombre')));
+        $qb->setParameter(':nombre', $nombre);
 		
-		$usuario = $qb->getQuery()->getFirstResult();
+		$usuario = $qb->getQuery()->getResult();
+        $usuario = $usuario[0];
 
         $arrayUsuario = array();
 
-		$arrayUsuario["id"] = $usuario->getId();
+		$arrayUsuario["id"] = $usuario->getDni();
 		$arrayUsuario["nombre"] = $usuario->getUsername();
-		
 			
     	return new JsonResponse($arrayUsuario);
     }

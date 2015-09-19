@@ -31,7 +31,7 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
         $this->user = $user;
 
         //el 2do parametro hace que ignore o no las recetas que el usuario ya tiene en el perfil
-        $this->qb = $this->buildQueryByFilters($arrayFiltros, true);
+        $this->qb = $this->buildQueryByFilters($arrayFiltros, false);
 
         if ($offset != 0 || $limit != 0){
             $this->qb->setFirstResult($offset)->setMaxResults($limit);
@@ -43,7 +43,7 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
         return $hydrateArray ? $this->qb->getQuery()->getArrayResult() : $this->qb->getQuery()->getResult();
     }
 
-    public function accept (EnfermedadesVisitor $visitor){
+    public function accept (IVisitor $visitor){
         return $visitor->visit($this);
     }
 

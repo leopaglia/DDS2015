@@ -12,12 +12,32 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Historial
 {
+
+    /**
+     * @param \AppBundle\Entity\Usuario $user
+     * @param \AppBundle\Entity\Receta $receta
+     */
+    public function __construct($user, $receta){
+
+        $this->setIdusuario($user);
+        $this->setIdreceta($receta);
+        $this->setFecha(new \DateTime());
+
+    }
+
     /**
      * @var \DateTime
      *
      * @ORM\Column(name="fecha", type="datetime", nullable=false)
      */
     private $fecha;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="aceptada", type="integer", nullable=true)
+     */
+    private $aceptada;
 
     /**
      * @var integer
@@ -49,17 +69,6 @@ class Historial
     private $idreceta;
 
 
-    /**
-     * @param \AppBundle\Entity\Usuario $user
-     * @param \AppBundle\Entity\Receta $receta
-     */
-    public function __construct($user, $receta){
-
-        $this->setIdusuario($user);
-        $this->setIdreceta($receta);
-        $this->setFecha(new \DateTime());
-
-    }
 
     /**
      * Set fecha
@@ -82,6 +91,29 @@ class Historial
     public function getFecha()
     {
         return $this->fecha;
+    }
+
+    /**
+     * Set aceptada
+     *
+     * @param integer $aceptada
+     * @return Historial
+     */
+    public function setAceptada($aceptada)
+    {
+        $this->aceptada = $aceptada;
+
+        return $this;
+    }
+
+    /**
+     * Get aceptada
+     *
+     * @return integer 
+     */
+    public function getAceptada()
+    {
+        return $this->aceptada;
     }
 
     /**

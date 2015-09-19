@@ -4,6 +4,6 @@ namespace AppBundle\Repository;
 
 interface IVisitableRepository {
 
-    public function accept(EnfermedadesVisitor $v);
+    public function accept(IVisitor $v);
 
 }
