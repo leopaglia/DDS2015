@@ -168,60 +168,49 @@ class RecetasController extends BasicController{
      * @Route("/cargarReceta", name="generateRecipe")
      */
     public function generarRecetaAction(){
-    	
-    	//datos
-    	
-    	$arrayDificultades = array();
-    	$arrayTemporadas = array();
-    	$arrayIngredientes = array();
-    	$arrayCondimentos = array();
-    	$arrayClasificaciones = array();
 
-        $dificultades = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
-        $temporadas = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
+        $data = [];
+        $data["title"] = "Cargar nueva receta";
+        $data['dificultades'] = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
+        $data['temporadas'] = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
+        $data['ingredientes'] = $this->getDoctrine()->getRepository("AppBundle:Ingrediente")->findAll();
+        $data['condimentos'] = $this->getDoctrine()->getRepository("AppBundle:Condimento")->findAll();
+        $data['condiciones'] = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
 
-        foreach ($dificultades as $d){
-            $arrayDificultades[] = array("name" => $d->getDescripcion(), "value" => $d->getId());
-        }
-        foreach ($temporadas as $t){
-            $arrayTemporadas[] = array("name" => $t->getNombre(), "value" => $t->getId());
-        }
-
-    	//vista
     	
-		$fieldsets = array(
-     		
+/*		$fieldsets = array(
+
      			array("title" => "Tipo de receta", "fields" => array(
      					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese nombre"),
      					array("label" => "Dificultad", "type" => "select", "idName" => "dificultad", "options" => $arrayDificultades),
      					array("label" => "Temporada", "type" => "select", "idName" => "temporada", "options" => $arrayTemporadas),
      			)),
-				
+
 				array("title" => "Clasificacion", "fields" => array(
 						array("label" => "Clasificacion", "type" => "select", "idName" => "clasificacion", "options" => $arrayClasificaciones),
 				)),
-     					
+
      			array("title" => "Ingredientes", "fields" => array(
      					array("label" => "Ingredientes", "type" => "select", "idName" => "ingredientes", "options" => $arrayIngredientes),
      			)),
-				
+
 				array("title" => "Condimentos", "fields" => array(
 						array("label" => "Condimentos", "type" => "select", "idName" => "condimentos", "options" => $arrayCondimentos),
 				)),
 
-     			
-     	);	
-    	
+
+     	);
+
     	$buttons = array(
     			array("type" => "submit", "text" => "Guardar")
     	);
-    	
+
     	$config = array(
     			"display"   => "accordion",
     			"routename" => "saveRecipe",
-    	);
+    	);*/
     	 
-    	return $this->renderBasicForm($fieldsets, $buttons, $config, "Crear nueva receta");
+    	return $this->render("recetas/nuevaReceta.html.twig", $data);
     }
     
     
