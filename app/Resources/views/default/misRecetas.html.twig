@@ -1,0 +1,98 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+
+<div class="panel panel-primary" style="max-height: 40%">
+
+    <div class="panel-heading">
+        <label class="panel-title"> Mis Recetas </label>
+    </div>
+
+    <div class="panel-body">
+
+        <div class="panel-body">
+            <table id="tablaMisRecetas" class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Temporada</th>
+                    <th>Dificultad</th>
+                    <th>Calor&iacute;as por porci&oacute;n</th>
+                    <th>Calificaci&oacute;n</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock body_container_main%}	
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+
+            $(document).on('click', '.delete', function(){
+
+                app.showLoading("Eliminando receta");
+                var idReceta  = misRecetasTable.row($(this).parent().parent()).data()['id'];
+
+                $.ajax({
+                    type: 'POST',
+                    data:  {'id':idReceta},
+                    url: "{{ path('eliminarReceta') }}"
+                }).success(function(data, textStatus, jqXHR){
+                    app.hideLoading();
+                    loadTable();
+                });
+
+            });
+
+            function loadTable() {
+
+                app.showLoading("Cargando recetas");
+
+                $.ajax({
+                    type: 'POST',
+                    data: {'owner': 'me'},
+                    url: "{{ path('buscarRecetas') }}"
+                }).success(function(data, textStatus, jqXHR){
+
+                    app.hideLoading();
+                    misRecetasTable.clear();
+                    misRecetasTable.rows.add(data).draw();
+
+                });
+
+            }
+
+            var misRecetasTable = $("#tablaMisRecetas").DataTable({
+                "dom" : 't',
+                "autoWidth" : true,
+                "columns": [
+                    { "data": "nombre"},
+                    { "data": "temporada" },
+                    { "data": "dificultad" },
+                    { "data": "calorias" },
+// 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
+                    { "data": "calificacion"}, //hasta arreglar el plugin
+                    { "data": null, "render": function ( data, type, full, meta ) {return app.createIcon(app.icons.DELETE, "Eliminar")} }
+
+                ]
+            });
+
+            loadTable();
+
+        });
+
+	</script>	
+
+{% endblock body_js %}
+

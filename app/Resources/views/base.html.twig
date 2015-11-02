@@ -1,134 +1,125 @@
 <!doctype html>
 <html>
+
 	<head>
-	{% block head %}
+
 		<title>{% block head_title %}Que comemos hoy?{% endblock %}</title>
-	
-		{% block head_css %}
-	    	<link href="{{  asset("bundles/app/css/base.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/bootstrap.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/jquery-ui.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/jquery.multiselect.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/jquery.multiselect.filter.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/multi-select.css")}}" rel="stylesheet" type="text/css" />
-	    	<link href="{{  asset("bundles/app/css/core/jquery.rating.css")}}" rel="stylesheet" type="text/css" />
-            <link href="{{  asset("bundles/app/css/core/font-awesome-4.4.0/css/font-awesome.css")}}" rel="stylesheet" type="text/css" />
-	    	
-	    {% endblock %}
-	      
-    {% endblock head %}
+
+        <link href="{{  asset("bundles/app/css/core/bootstrap.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/jquery-ui.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/jquery.multiselect.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/jquery.multiselect.filter.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/multi-select.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/jquery.rating.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/core/font-awesome-4.4.0/css/font-awesome.css")}}" rel="stylesheet" type="text/css" />
+        <link href="{{  asset("bundles/app/css/base.css")}}" rel="stylesheet" type="text/css" />
+
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-2.1.4.js")}}"></script>
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-ui.js")}}"></script>
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.blockUI.js")}}"></script>
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/bootstrap.js")}}"></script>
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.dataTables.js")}}"></script>
+        <script type="text/javascript" src="{{  asset("bundles/app/js/core/raty-2.7.0/lib/jquery.raty.js")}}"></script>
+
+
     </head>
 
     <body>
-        {%block body_container%}
-          <div id="container">
-            
-            <header>
-        		{% block body_container_header %}
-					<div id="header">
-						<div class="wrapper">
-{# 							<div id="logo"><img src="{{ asset('bundles/app/img/header.jpg')}}"></div>#}
-						</div>
-					</div>
-					{% block user_info %}
-						{% if app.user %}
-                            {% block userMenu %}
+        <div id="container">
 
-                                <div>
-                                    <ul id="user_info">
-                                        <li><a href="#">{{ app.user.username }}</a>
-                                            <ul>
-                                                <li><a href="{{ path("profile") }}">Mi Perfil</a></li>
-                                                <li><a href="{{ path("myGroups") }}">Mis Grupos</a></li>
-                                                <li><a href="{{ path("myRecipes") }}">Mis Recetas</a></li>
-                                                <li><a href="{{ path("logout") }}">Cerrar Sesi&oacuten</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </div>
+         <div class="well" style="padding-right: 3%;">
+            {% block body_container_header %}
 
-                            {% endblock userMenu %}
-		              	{% endif %}
-	              	{% endblock %}
-					
-					{% block menu %}
-						<div class="well" style="width: 100%;">
-						
-							<div class="row">
+                <a href="{{ path('homepage') }}"><img style="max-height: 100px; max-width: 100px"; src="{{ asset('bundles/app/img/logo.jpg')}}"/></a>
 
-								<div class="col-sm-3" style="text-align: left;">
-							  		<h4>{{ title|default("") }}</h4>
-							  	</div>
+                <div class="pull-right">
+                    {% if app.user %}
+                        <p>Bienvenido, <b>{{ app.user.username }}</b>!</p>
+                        <p class="pull-right"><a href="{{ path('fos_user_security_logout') }}">Cerrar sesión</a></p>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_login') }}"><button type="button" class="btn btn-lg btn-default">Ingresar</button></a>
+                        <a href="{{ path('fos_user_registration_register') }}"><button type="button" class="btn btn-lg btn-default">Registrarse</button></a>
+                    {% endif %}
+                </div>
 
-						  		<div id="cssmenu" class="col-sm-8" align="right">
-						  			{% block buttons %}
-			              			{% endblock buttons %}
-			              		</div>
-			              		
-								<div class="col-sm-1" style="text-align: right;">
-									<a href="javascript:history.back()"><img  width="50" height="50" src="{{ asset('bundles/app/img/backIcon.png') }}"></a>
-									<a href="{{ path('homepage') }}"><img  width="50" height="50" src="{{ asset('bundles/app/img/homeIcon.png') }}"></a>
-								</div>
-								
-							</div>
-							
-						</div>
-					{% endblock %}
-					
-					{% block console_errors %}
-						<!-- Consola de Errores -->
-						<div class="alert alert-danger" id="errores">
-					    	<ul>{% for flashMessage in app.session.flashbag.get('error') %}<li>{{ flashMessage }}</li>{% endfor %}</ul>
-					    </div>
-					{% endblock %}
+            {% endblock body_container_header %}
+        </div>
 
-					{% block console_notice %}
-					    <!-- Consola de Mensaje de Alerta -->
-						<div class="alert alert-info" id="notices">
-					    	<ul>{% for flashMessage in app.session.flashbag.get('notice') %}<li>{{ flashMessage }}</li>{% endfor %}</ul>
-					    </div>
-					{% endblock %}
-				
-				{% endblock body_container_header %}
-            </header>
-            
-            <div role="main">
-              {% block body_container_main %}{% endblock %}
-            </div>
-            <footer>
-              {% block body_container_footer %}
-			    <div id="footer">
-					<div class="wrapper" >
-						<div id="footer_logo" class="contenedor">
-			{# 				<img src="{{ asset('bundles/sti/images/footer1.png') }}" class="izq">#}
-							<div class="central"></div>
-			{# 				<img src="{{ asset('bundles/sti/images/footer3.png') }}" class="der">#}
-						</div>
-					</div>
-				</div>
-              {% endblock %}
-            </footer>
-          </div>
-          
-          	{% block dialog1 %}{% endblock %}
-          	{% block dialog2 %}{% endblock %}
-          	{% block dialog3 %}{% endblock %}
-          	
-        {%endblock body_container%}
+        <div role="main">
+            {% if app.user %}
+                {% block navbar %}
+                    <nav class="navbar navbar-default clearfix">
+                        <div class="container-fluid clearfix">
 
+                            <!-- Brand and toggle get grouped for better mobile display -->
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                                <a class="navbar-brand" href="{{ path('homepage') }}">Que comemos hoy?</a>
+                            </div>
+
+                            <!-- Collect the nav links, forms, and other content for toggling -->
+                            <div class="collapse navbar-collapse">
+                                <ul class="nav navbar-nav">
+
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Perfil <span class="caret"></span> </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{{ path('modifyProfile') }}"> Modificar perfil </a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="{{ path('myGroups') }}"> Mis recetas </a></li>
+                                            <li><a href="#" id="crearGrupo"> Crear nuevo grupo </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Recetas <span class="caret"></span> </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="{{ path('seleccionarRecetas') }}"> Seleccionar Recetas </a></li>
+                                            <li role="separator" class="divider"></li>
+                                            <li><a href="{{ path('generateRecipe') }}"> Cargar nueva receta </a></li>
+                                            <li><a href="{{ path('myRecipes') }}"> Mis recetas </a></li>
+                                        </ul>
+                                    </li>
+
+                                    <li><a href="{{ path('estadisticas') }}"> Estadisticas </a></li>
+
+                                    <li><a href="{{ path('reports') }}"> Reportes </a></li>
+
+                                </ul>
+
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li><a href="{{ path('homepage') }}"><img  width="30" height="30" src="{{ asset('bundles/app/img/homeIcon.png') }}"></a></li>
+                                </ul>
+                            </div><!-- /.navbar-collapse -->
+
+                        </div><!-- /.container-fluid -->
+                    </nav>
+                {% endblock navbar %}
+            {% endif %}
+
+            {% block body_container_main %}
+
+                <div class="alert alert-success">
+                    <ul>{% for flashMessage in app.session.flashbag.get('notice') %}<li>{{ flashMessage }}</li>{% endfor %}</ul>
+                </div>
+
+                {% block fos_user_content %}
+                {% endblock %}
+
+            {% endblock %}
+        </div>
+        <footer>
+          {% block body_container_footer %}
+          {% endblock %}
+        </footer>
+        </div>
 
         {% block body_js %}
-        
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-2.1.4.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery-ui.js")}}"></script>
-            <script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.blockUI.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multiselect.filter.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.multi-select.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.dataTables.js")}}"></script>
-        	<script type="text/javascript" src="{{  asset("bundles/app/js/core/jquery.rating.js")}}"></script>
-
-
 
             <script type="text/javascript" src="{{  asset("bundles/app/js/App.js") }}"></script>
 
@@ -140,15 +131,71 @@
 
                     window.app.init("{{ asset("") }}");
 
-                    if ($("#errores ul li").length > 0){
-                        $("#errores").show();
-                    }
+                });
 
-                    if ($("#notices ul li").length > 0){
-                        $("#notices").show();
-                    }
+            </script>
 
-                    $("#user_info").menu({ position: { my: "right top", at: "right-1 top+35" } });
+            <!-- script de grupos -->
+            <script type="text/javascript">
+
+                $('#crearGrupo').click(function() {
+                    $('#grupoDialog').dialog('open');
+                });
+
+                $(".usuario").click(function(e){
+                    e.preventDefault();
+                    $(this).addClass('hide');
+                    var usuarioTemplate = '<button value="'+this.value+'" type="button" id="'+this.id+'" class="usuario-agregado btn btn-default" style="width: 90% !important;">'+this.value+'</button>';
+                    $("#seleccionados").append(usuarioTemplate);
+                });
+
+                $(document).on('click', '.usuario-agregado', function(){
+                    $("#usuarios-disponibles").find("button[value='"+this.value+"']").removeClass('hide');
+                    $(this).remove();
+                });
+
+                $('#confirmarGrupo').click(function(e) {
+
+                    e.preventDefault();
+
+                    var nombreGrupo = $("#name").val();
+                    var usuarios = [];
+                    $("#seleccionados button").each(
+                            function(){
+                                usuarios.push(this.id);
+                            }
+                    );
+
+                    $.ajax({
+                        type: "POST",
+                        data: {
+                            nombreGrupo: nombreGrupo,
+                            usuarios: usuarios
+                        },
+                        {#url: '{{ urlCrearGrupo }}'#}
+                    }).success(function(data, textStatus, jqXHR){
+                        alert('Grupo creado');
+                    });
+
+                });
+
+
+                $("#grupoDialog").dialog({
+
+                    autoOpen: false,
+                    draggable: true,
+                    resizable: false,
+                    width: 500,
+
+                    show: {
+                        effect: "clip",
+                        duration: 500,
+                    },
+
+                    hide: {
+                        effect: "clip",
+                        duration: 500
+                    }
                 });
 
             </script>

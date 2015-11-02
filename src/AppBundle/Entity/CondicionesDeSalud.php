@@ -31,13 +31,20 @@ class CondicionesDeSalud
     /**
      * @var \Doctrine\Common\Collections\Collection
      *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GruposAlimenticios", mappedBy="idCondicion")
+     */
+    private $idGrupo;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
      * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Usuario", inversedBy="idcondiciones")
      * @ORM\JoinTable(name="condiciones_usuario",
      *   joinColumns={
      *     @ORM\JoinColumn(name="idCondiciones", referencedColumnName="id")
      *   },
      *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="dni")
+     *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="id")
      *   }
      * )
      */
@@ -48,6 +55,7 @@ class CondicionesDeSalud
      */
     public function __construct()
     {
+        $this->idGrupo = new \Doctrine\Common\Collections\ArrayCollection();
         $this->idusuario = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
@@ -83,6 +91,39 @@ class CondicionesDeSalud
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Add idGrupo
+     *
+     * @param \AppBundle\Entity\GruposAlimenticios $idGrupo
+     * @return CondicionesDeSalud
+     */
+    public function addIdGrupo(\AppBundle\Entity\GruposAlimenticios $idGrupo)
+    {
+        $this->idGrupo[] = $idGrupo;
+
+        return $this;
+    }
+
+    /**
+     * Remove idGrupo
+     *
+     * @param \AppBundle\Entity\GruposAlimenticios $idGrupo
+     */
+    public function removeIdGrupo(\AppBundle\Entity\GruposAlimenticios $idGrupo)
+    {
+        $this->idGrupo->removeElement($idGrupo);
+    }
+
+    /**
+     * Get idGrupo
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdGrupo()
+    {
+        return $this->idGrupo;
     }
 
     /**

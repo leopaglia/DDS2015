@@ -17,10 +17,11 @@ class Historial
      * @param \AppBundle\Entity\Usuario $user
      * @param \AppBundle\Entity\Receta $receta
      */
-    public function __construct($user, $receta){
+    public function __construct($user, $receta, $aceptada){
 
         $this->setIdusuario($user);
         $this->setIdreceta($receta);
+        $this->setAceptada($aceptada);
         $this->setFecha(new \DateTime());
 
     }
@@ -53,7 +54,7 @@ class Historial
      *
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Usuario")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="idusuario", referencedColumnName="dni")
+     *   @ORM\JoinColumn(name="idusuario", referencedColumnName="id")
      * })
      */
     private $idusuario;

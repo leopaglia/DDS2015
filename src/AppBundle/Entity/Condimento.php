@@ -22,13 +22,6 @@ class Condimento
     /**
      * @var integer
      *
-     * @ORM\Column(name="tipo", type="integer", nullable=true)
-     */
-    private $tipo;
-
-    /**
-     * @var integer
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -72,29 +65,6 @@ class Condimento
     public function getNombre()
     {
         return $this->nombre;
-    }
-
-    /**
-     * Set tipo
-     *
-     * @param integer $tipo
-     * @return Condimento
-     */
-    public function setTipo($tipo)
-    {
-        $this->tipo = $tipo;
-
-        return $this;
-    }
-
-    /**
-     * Get tipo
-     *
-     * @return integer 
-     */
-    public function getTipo()
-    {
-        return $this->tipo;
     }
 
     /**

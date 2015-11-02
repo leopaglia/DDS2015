@@ -66,7 +66,7 @@
 					  <th>Temporada</th>	
 					  <th>Dificultad</th>
 					  <th>Calor&iacute;as por porci&oacute;n</th>	
-					  {#<th>Calificaci&oacute;n</th>#}
+					  <th>Calificaci&oacute;n</th>
 					</tr>
 			   </thead>
 			</table>
@@ -116,7 +116,7 @@
 					                    { "data": "dificultad" },
 					                    { "data": "calorias" },
 // 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
-//										{ "data": "calificacion"}, //hasta arreglar el plugin
+										{ "data": "calificacion"}, //hasta arreglar el plugin
 					                ]
             });
 
@@ -127,7 +127,7 @@
 				 $.ajax({
 						type: 'POST',
 						data:{
-                            'tipoReporte' : $("#tipoReporte").val(),
+                            'tipoReporte' : $('input[name="tipoReporte"]:checked').val(),
                             'fechaDesde' : $("#fechaDesde").val(),
                             'fechaHasta' : $("#fechaHasta").val()
                         },

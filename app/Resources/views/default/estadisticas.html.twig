@@ -85,28 +85,6 @@
 
 
 
-    <div class="panel panel-default" style="width: 30%;">
-
-        <div class="panel-heading">
-            <h3 class="panel-title">Ranking</h3>
-        </div>
-
-        <div class="panel-body">
-            <table id="tablaRanking" class="table table-bordered">
-                <tr>
-                    <th>Receta</th>
-                    <th>Visitas</th>
-                <tr>
-                    {% for t in data.ranking %}
-                <tr>
-                    <td><a href="{{ t.receta.url }}">{{ t.receta.nombre }}</a></td>
-                    <td>{{ t.visitas }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-    </div>
 
 {% endblock body_container_main%}
 

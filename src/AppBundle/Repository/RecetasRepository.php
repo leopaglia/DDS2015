@@ -10,6 +10,7 @@ use Doctrine\ORM\Query\Lexer as Lexer;
 
 use AppBundle\Entity\Usuario as User;
 use AppBundle\Constants\RangeConstants;
+use Proxies\__CG__\AppBundle\Entity\Usuario;
 use Symfony\Component\Validator\Constraints\DateTime;
 
 
@@ -17,6 +18,7 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
     public $user;
     public $qb;
+    public $em;
 
     /**
      * @param mixed $arrayFiltros
@@ -26,9 +28,10 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
      * @param bool $hydrateArray
      * @return array
      */
-    public function getRecetasByFilters ($arrayFiltros, $user, $offset=0, $limit=0, $hydrateArray = false){
+    public function getRecetasByFilters ($arrayFiltros, $user, $acceptVisitors = true, $offset=0, $limit=0, $hydrateArray = false){
 
         $this->user = $user;
+        $this->em = $this->getEntityManager();
 
         //el 2do parametro hace que ignore o no las recetas que el usuario ya tiene en el perfil
         $this->qb = $this->buildQueryByFilters($arrayFiltros, false);
@@ -37,8 +40,13 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
             $this->qb->setFirstResult($offset)->setMaxResults($limit);
         }
 
-        $enfermedadesVisitor = new EnfermedadesVisitor();
-        $this->qb = $this->accept($enfermedadesVisitor); //agrega filtros segun las enfermedades del usuario
+        if ($acceptVisitors){
+            $enfermedadesVisitor = new EnfermedadesVisitor();
+            $this->qb = $this->accept($enfermedadesVisitor); //agrega filtros segun las enfermedades del usuario
+
+            $dietasVisitor = new DietasVisitor();
+            $this->qb = $this->accept($dietasVisitor); //agrega filtros segun las dietas del usuario
+        }
 
         return $hydrateArray ? $this->qb->getQuery()->getArrayResult() : $this->qb->getQuery()->getResult();
     }
@@ -65,6 +73,26 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
         return $hydrateArray ? $qb->getQuery()->getArrayResult() : $qb->getQuery()->getResult();
     }
+
+    /**
+     * @param User $user
+     * @param mixed $arrayFiltros
+     * @param int $offset
+     * @param int $limit
+     * @param bool $hydrateArray
+     * @return array
+     */
+    public function getRecomendaciones ($usuario, $offset=0, $limit=0, $hydrateArray = false){
+
+        $qb = $this->buildQueryRecomendaciones($usuario);
+
+        if ($offset != 0 || $limit != 0){
+            $qb->setFirstResult($offset)->setMaxResults($limit);
+        }
+
+        return $hydrateArray ? $qb->getQuery()->getArrayResult() : $qb->getQuery()->getResult();
+    }
+
 
     /**
      * @param mixed $filtros
@@ -134,11 +162,10 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
         $filtros = $this->trimFilters($filtros);
 
-        if ($this->validFilter($filtros['ingrediente'])){
+        if ($this->validFilter($filtros['nombre'])){
 
-            $qb ->join("r.idingrediente", "i")
-                ->andWhere($qb->expr()->like("i.nombre", ":nombre"))
-                ->setParameter("nombre", $this->wildcard($filtros['ingrediente']));
+            $qb ->andWhere($qb->expr()->like("r.nombre", ":nombre"))
+                ->setParameter("nombre", $this->wildcard($filtros['nombre']));
 
         }
 
@@ -156,17 +183,28 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
         }
 
-        if ($this->validFilter($filtros['caloriasDesde'])){
+        if ($this->validFilter($filtros['clasificacion'])){ //FIXME
 
-            $qb ->andWhere($qb->expr()->gte("r.calorias", ":caloriasDesde"))
-                ->setParameter("caloriasDesde", $filtros['caloriasDesde']);
+            //$qb->innerJoin("r.idClasificacion c ON c.id = r.idClasificacion");
+
+            //$qb ->andWhere($qb->expr()->eq("r.idClasificacion", ":idClasificacion"))
+            //    ->setParameter("idClasificacion", $filtros['clasificacion']);
 
         }
 
-        if ($this->validFilter($filtros['caloriasHasta'])){
+        if ($this->validFilter($filtros['grupoAlimenticio'])){
 
-            $qb ->andWhere($qb->expr()->lte("r.calorias", ":caloriasHasta"))
-                ->setParameter("caloriasHasta", $filtros['caloriasHasta']);
+            $qb ->andWhere($qb->expr()->eq("r.grupoAlim", ":grupoAlim"))
+                ->setParameter("grupoAlim", $filtros['grupoAlimenticio']);
+
+        }
+
+        if ($this->validFilter($filtros['owner'])){
+
+            if($filtros['owner'] == "me"){
+                $qb ->andWhere($qb->expr()->eq("r.idUsuario", ":idusuario"))
+                    ->setParameter("idusuario", $this->user->getId());
+            }
 
         }
 
@@ -195,6 +233,8 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
         $qb ->select("r")
             ->from("AppBundle:Receta", "r")
             ->innerJoin("AppBundle:Historial", "h", 'WITH', 'h.idreceta = r.id')
+            ->andWhere($qb->expr()->eq("h.idusuario", ":id"))
+            ->setParameter("id", $user->getId())
             ->orderBy("r.nombre")
         ;
 
@@ -203,19 +243,16 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
         if ($this->validFilter($filtros['tipoReporte'])){
 
             if($filtros['tipoReporte'] == ReportConstants::CONSULTADAS){
-                //TODO seran todas las consultadas? y en preferidas las mas consultadas?
-                $qb->andWhere($qb->expr()->eq("h.idusuario", ":dni"));
-                $qb->setParameter("dni", $user->getDni());
+                $qb->andWhere($qb->expr()->eq("h.aceptada", '0'));
             }
 
             if($filtros['tipoReporte'] == ReportConstants::PREFERIDAS){
-                //TODO mas visitadas?? es lo mismo que consultadas
-                $qb->andWhere($qb->expr()->eq("h.idusuario", ":dni"));
-                $qb->setParameter("dni", $user->getDni());
+                $qb->andWhere($qb->expr()->eq("h.aceptada", '1'));
             }
 
             if($filtros['tipoReporte'] == ReportConstants::PROPUESTAS){
-                //TODO creadas por el usuario
+                $qb->andWhere($qb->expr()->eq("r.idUsuario", ":id"));
+                $qb->setParameter("id", $user->getId());
             }
 
         }
@@ -240,12 +277,74 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
     /**
      * @return \Doctrine\ORM\QueryBuilder
      */
+    private function buildQueryRecomendaciones (\AppBundle\Entity\Usuario $user){
+
+        //ultimas 10 recetas aceptadas
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb ->select("r")
+            ->from("AppBundle:Historial", "h")
+            ->innerJoin("AppBundle:Receta", "r", 'WITH', 'h.idreceta = r.id')
+            ->where('h.aceptada = 1')
+            ->andWhere('h.idusuario = :id')
+            ->setParameter("id", $user->getId())
+            ->orderBy("h.fecha")
+            ->setMaxResults(10);
+        ;
+        if($qb->getQuery()->getResult())
+            return $qb;
+
+
+        //ultimas 10 recetas calificadas //TODO
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb ->select("r")
+            ->from("AppBundle:Historial", "h")
+            ->innerJoin("AppBundle:Receta", "r", 'WITH', 'h.idreceta = r.id')
+            ->where('h.aceptada = 1')
+            ->andWhere('h.idusuario = :id')
+            ->setParameter("id", $user->getId())
+            ->orderBy("h.fecha")
+            ->setMaxResults(10);
+        ;
+        if($qb->getQuery()->getResult())
+            return $qb;
+
+
+        //ultimas 10 recetas miradas
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb ->select("r")
+            ->from("AppBundle:Historial", "h")
+            ->innerJoin("AppBundle:Receta", "r", 'WITH', 'h.idreceta = r.id')
+            ->where('h.aceptada = 0')
+            ->andWhere('h.idusuario = :id')
+            ->setParameter("id", $user->getId())
+            ->orderBy("h.fecha")
+            ->setMaxResults(10);
+        ;
+        if($qb->getQuery()->getResult())
+            return $qb;
+
+
+        //10 mejores calificadas
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb ->select("r")
+            ->from("AppBundle:Receta", "r")
+            ->orderBy("r.calificacion")
+            ->setMaxResults(10);
+
+        return $qb;
+
+    }
+
+    /**
+     * @return \Doctrine\ORM\QueryBuilder
+     */
     private function buildQueryByMostViews (){
 
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->select("r, COUNT(h.id) AS views")
             ->from("AppBundle:Historial", "h")
             ->innerJoin("AppBundle:Receta", "r", 'WITH', 'h.idreceta = r.id')
+            ->where('h.aceptada = 0') //cuenta solo visitas
             ->groupBy("r.nombre")
             ->orderBy("views", "DESC");
         ;

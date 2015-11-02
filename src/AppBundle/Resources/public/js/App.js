@@ -4,8 +4,6 @@ App.prototype = {
 
     root: null,
 
-    //magic number las pelotas, es un array de config
-    //chupame un huevo jslint
     config: {
 
         icons:{
@@ -69,6 +67,9 @@ App.prototype = {
 
         if (name === this.icons.ADD) {
             img.src = this.root + "bundles/app/img/add.png";
+        }
+        if (name === this.icons.DELETE) {
+            img.src = this.root + "bundles/app/img/delete.png";
         }
 
         img.alt = title;

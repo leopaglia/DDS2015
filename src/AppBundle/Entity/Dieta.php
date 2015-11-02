@@ -28,6 +28,20 @@ class Dieta
      */
     private $id;
 
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\GruposAlimenticios", mappedBy="idDieta")
+     */
+    private $idGrupo;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->idGrupo = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
 
     /**
@@ -61,5 +75,38 @@ class Dieta
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Add idGrupo
+     *
+     * @param \AppBundle\Entity\GruposAlimenticios $idGrupo
+     * @return Dieta
+     */
+    public function addIdGrupo(\AppBundle\Entity\GruposAlimenticios $idGrupo)
+    {
+        $this->idGrupo[] = $idGrupo;
+
+        return $this;
+    }
+
+    /**
+     * Remove idGrupo
+     *
+     * @param \AppBundle\Entity\GruposAlimenticios $idGrupo
+     */
+    public function removeIdGrupo(\AppBundle\Entity\GruposAlimenticios $idGrupo)
+    {
+        $this->idGrupo->removeElement($idGrupo);
+    }
+
+    /**
+     * Get idGrupo
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getIdGrupo()
+    {
+        return $this->idGrupo;
     }
 }

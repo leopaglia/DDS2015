@@ -16,9 +16,7 @@ use AppBundle\Entity\Usuario;
 class SecurityController extends Controller
 {
 
-	/**
-     * @Route("/login", name="login")
-     */
+
     public function loginAction(){
     	
 	 	$authenticationUtils = $this->get('security.authentication_utils');
@@ -32,9 +30,7 @@ class SecurityController extends Controller
 	    return $this->render('security/login.html.twig', array('last_username' => $lastUsername, 'error' => $error,  "title" => "DDS 2015"));
     }
     
-    /**
-     * @Route("/signup", name="signup")
-     */
+
     public function signupAction(Request $request){
     	 
     	$dni =  $request->request->get("_dni");
@@ -58,18 +54,14 @@ class SecurityController extends Controller
 //     public function onAuthenticationFailure(AuthenticationFailureEvent $exception){
     	
 //     	//return new RedirectResponse($this->generateUrl('login'));
-// 		throw new WrongLoginException("Usuario o contraseña incorrectos."); //una verga, cambiar esto
+// 		throw new WrongLoginException("Usuario o contraseï¿½a incorrectos.");
 //     }	
     	
     // these controllers will not be executed,
     // as the route is handled by the Security system
-    /**
-     * @Route("/login_check", name="login_check")
-     */
+
     public function loginCheckAction(){}
     
-    /**
-     * @Route("/logout", name="logout")
-     */
+
     public function logoutAction(){}
 }

@@ -37,7 +37,7 @@ class Grupo
      *     @ORM\JoinColumn(name="idGrupo", referencedColumnName="id")
      *   },
      *   inverseJoinColumns={
-     *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="dni")
+     *     @ORM\JoinColumn(name="idUsuario", referencedColumnName="id")
      *   }
      * )
      */

@@ -1,0 +1,48 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+
+    {% for grupo in grupos %}
+
+        <div class="accordion">
+
+            <h3>{{ grupo.nombre }}</h3>
+
+            <div>
+                {% for user in grupo.users %}
+                    <div>{{ user.username }}</div>
+                {% endfor %}
+            </div>
+
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% endblock body_container_main %}
+
+
+{% block body_js %}
+
+    {{ parent() }}
+
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            //INIT
+
+            $(".accordion").accordion({
+                header: "h3",
+                collapsible: true,
+                active: true
+
+            });
+
+        })
+
+    </script>
+
+{% endblock body_js %}
+

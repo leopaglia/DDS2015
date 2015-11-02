@@ -13,16 +13,16 @@
 				<div style="float:left; width:50%;">
 
 					<div class="form-group">
-				    	<label for="ingrediente" class="control-label col-sm-3">Ingrediente Principal:</label>
+				    	<label for="nombre" class="control-label col-sm-3">Nombre:</label>
 				    	<div class="col-sm-7">
-							<input id="ingrediente" type="text" class="form-control col-xs-4 col-lg-1" name="ingrediente" placeholder=" Ingrese Ingrediente Principal">
+							<input id="nombre" type="text" class="form-control col-xs-4 col-lg-1" name="nombre" placeholder=" Ingrese Nombre de la Receta">
 						</div>
 					</div>
 
 					<div class="form-group">
 				    	<label for="temporada" class="control-label col-sm-3">Temporada:</label>
 						<div class="col-sm-7">
-							<select id="temporada" type="text" class="form-control col-lg-2" name="temporada">
+							<select id="temporada" class="form-control col-lg-2" name="temporada">
                                 <option value="" selected>Cualquier Temporada</option>
 								{% for temporada in data.temporadas %}
                                     <option value="{{ temporada.id }}">{{ temporada.nombre }}</option>
@@ -30,6 +30,18 @@
 							</select>
 						</div>
 					</div>
+
+                    <div class="form-group">
+                        <label for="clasificacion" class="control-label col-sm-3">Clasificación:</label>
+                        <div class="col-sm-7">
+                            <select id="clasificacion" class="form-control col-lg-2" name="clasificacion">
+                                <option value="" selected>Cualquier Clasificación</option>
+                                {% for clasificacion in data.clasificaciones %}
+                                    <option value="{{ clasificacion.id }}">{{ clasificacion.descripcion }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
 
 				</div>
 				
@@ -60,7 +72,21 @@
 								</select>	
 							</div>
 						</div>	 
-					</div>	 
+					</div>
+
+                    <div class="form-group">
+                        <label for="grupoAlimenticio" class="control-label col-sm-3">Grupo Alimenticio:</label>
+                        <div class="col-sm-7">
+                            <div class="col-sm-12">
+                                <select id="grupoAlimenticio" class="form-control col-lg-2" name="grupoAlimenticio">
+                                    <option value="" selected>Cualquier Grupo Alimenticio</option>
+                                    {% for grupoAlimenticio in data.gruposAlimenticios %}
+                                        <option value="{{ grupoAlimenticio.id }}">{{ grupoAlimenticio.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 				
 				</div>	
 				
@@ -111,27 +137,10 @@
     	
 		$(document).ready(function() {
 
-			var starTag = "<input name='star' type='radio'class='star' disabled='disabled'>";
-			var checkedStarTag = "<input name='star' type='radio'class='star' checked='checked' disabled='disabled'>";
+			var printStars = function(cant){
 
-			
-			var printStars = function(data){
+                return '<div class="rat" title="'+cant+'"></div>';
 
-				var localAux = '';
-
-                var i;
-                var j;
-
-                for(i = 1; i < data; i++) {
-                    localAux = localAux + starTag;
-                }
-
-                localAux = localAux+checkedStarTag;
-
-				for(j = 0; j < (5-i); j++)
-					localAux = localAux+starTag;
-
-				return localAux;
 			}
 
             function eventsOnCallback() {
@@ -175,8 +184,7 @@
 					                    { "data": "temporada" },
 					                    { "data": "dificultad" },
 					                    { "data": "calorias" },
-// 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
-										{ "data": "calificacion"}, //hasta arreglar el plugin
+					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
 					                    { "data": null, "render": function ( data, type, full, meta ) {return app.createIcon("add", "Agregar al Perfil")} }
 
 					                ],
@@ -193,11 +201,13 @@
 				 $.ajax({
 						type: 'POST',
 						data:{
-                            'ingrediente' : $("#ingrediente").val(),
+                            'nombre' : $("#nombre").val(),
                             'temporada' : $("#temporada").val(),
                             'caloriasDesde' : $("#caloriasDesde").val(),
                             'caloriasHasta' : $("#caloriasHasta").val(),
-                            'dificultad' : $("#dificultad").val()
+                            'dificultad' : $("#dificultad").val(),
+                            'clasificacion' : $("#clasificacion").val(),
+                            'grupoAlimenticio' : $("#grupoAlimenticio").val()
                         },
 						url: "{{ path('buscarRecetas') }}"
 					}).success(function(data, textStatus, jqXHR){
@@ -206,11 +216,13 @@
 						table.clear();
 						table.rows.add(data).draw();
 
+                        //$('.rat').raty({ readOnly: true, score: this.title });
+                        $('.rat').each(function(){
+                            var cant = this.title;
+                            $(this).raty({ readOnly: true, score: cant });
+                        })
 
-						
-						$(".star").rating();
-						
-					});
+                 });
 
 			});
 

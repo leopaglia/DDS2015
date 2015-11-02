@@ -10,75 +10,79 @@
 			<div class="panel-body">
                 <i><b><h3 style="color: #637CBA;">{{ nombre }}</h3></b></i>
 
-                <div id="paso1wrap">
-                    <div style="float:left; width:50%;">
-                        {% if paso1 is not null %}
-                            <p>{{ paso1 }}</p>
-                        {% endif %}
+                <div id="pasosWrapper" style="margin: 0 auto;">
+
+                    <div id="paso1wrap" style="clear:both">
+                        <div style="float:left; width:50%;">
+                            {% if paso1 is not null %}
+                                <p>{{ paso1 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div style="float:right; width:50%;">
+                            {% if foto1 is not null %}
+                                <img src={{ foto1 }} height="300" width="400">
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div style="float:right; width:50%;">
-                        {% if foto1 is not null %}
-                            <img src={{ foto1 }} height="300" width="400">
-                        {% endif %}
-                    </div>
-                </div>
+                    <div id="paso2wrap" style="clear:both">
+                        <div style="float:left; width:50%;">
+                            {% if foto2 is not null %}
+                                <img src={{ foto2 }} height="300" width="400">
+                            {% endif %}
+                        </div>
 
-                <div id="paso2wrap">
-                    <div style="float:left; width:50%;">
-                        {% if paso2 is not null %}
-                            <p>{{ paso2 }}</p>
-                        {% endif %}
-                    </div>
-
-                    <div style="float:right; width:50%;">
-                        {% if foto2 is not null %}
-                            <img src={{ foto2 }} height="300" width="400">
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div id="paso3wrap">
-                    <div style="float:left; width:50%;">
-                        {% if paso3 is not null %}
-                            <p>{{ paso3 }}</p>
-                        {% endif %}
+                        <div style="float:right; width:50%;">
+                            {% if paso2 is not null %}
+                                <p>{{ paso2 }}</p>
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div style="float:right; width:50%;">
-                        {% if foto3 is not null %}
-                            <img src={{ foto3 }} height="300" width="400">
-                        {% endif %}
-                    </div>
-                </div>
+                    <div id="paso3wrap" style="clear:both">
+                        <div style="float:left; width:50%;">
+                            {% if paso3 is not null %}
+                                <p>{{ paso3 }}</p>
+                            {% endif %}
+                        </div>
 
-                <div id="paso4wrap">
-                    <div style="float:left; width:50%;">
-                        {% if paso4 is not null %}
-                            <p>{{ paso4 }}</p>
-                        {% endif %}
+                        <div style="float:right; width:50%;">
+                            {% if foto3 is not null %}
+                                <img src={{ foto3 }} height="300" width="400">
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div style="float:right; width:50%;">
-                        {% if foto4 is not null %}
-                            <img src={{ foto4 }} height="300" width="400">
-                        {% endif %}
-                    </div>
-                </div>
+                    <div id="paso4wrap" style="clear:both">
+                        <div style="float:left; width:50%;">
+                            {% if foto4 is not null %}
+                                <img src={{ foto4 }} height="300" width="400">
+                            {% endif %}
+                        </div>
 
-                <div id="paso5wrap">
-                    <div style="float:left; width:50%;">
-                        {% if paso5 is not null %}
+                        <div style="float:right; width:50%;">
+                            {% if paso4 is not null %}
+                                <p>{{ paso4 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="paso5wrap" style="clear:both">
+                        <div style="float:left; width:50%;">
+                            {% if paso5 is not null %}
                             <p><p>{{ paso5 }}</p>
                             </p>
                         {% endif %}
+                        </div>
+
+                        <div style="float:right; width:50%;">
+                            {% if foto5 is not null %}
+                                <img src={{ foto5 }} height="300" width="400">
+                            {% endif %}
+                        </div>
                     </div>
 
-                    <div style="float:right; width:50%;">
-                        {% if foto5 is not null %}
-                            <img src={{ foto5 }} height="300" width="400">
-                        {% endif %}
-                    </div>
                 </div>
 
             </div>

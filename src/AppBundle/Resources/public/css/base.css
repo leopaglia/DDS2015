@@ -54,3 +54,27 @@ td.group {
     -ms-transform: scale(1.5);
     transform: scale(1.5)
 }
+
+.left {
+    height: 100%;
+    width: 29%;
+    float: left !important;
+}
+
+.right {
+    height: 100%;
+    width: 69%;
+    float: right !important;
+}
+
+.left-half {
+    height: 100%;
+    width: 49%;
+    float: left !important;
+}
+
+.right-half {
+    height: 100%;
+    width: 49%;
+    float: right !important;
+}

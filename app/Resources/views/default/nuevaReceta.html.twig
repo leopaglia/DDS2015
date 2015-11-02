@@ -1,0 +1,285 @@
+{% extends "base.html.twig" %}
+
+{% block body_container_main %}
+
+    <div style="height: 100%; width: 100%;">
+
+        <form role="form" action="">
+
+            <div class="left">
+
+                <div class="panel panel-primary">
+
+                    <div class="panel-heading">
+                        <label class="panel-title"> Nueva Receta </label>
+                    </div>
+
+                    <div style="max-height: 780px; overflow-y:scroll;" class="panel-body">
+
+                        <div class="form-group">
+                            <label for="nombre" class="control-label"> Nombre: </label>
+                            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="El nombre de tu receta">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dificultad" class="control-label"> Dificultad: </label>
+                            <select id="dificultad" name="dificultad" class="form-control">
+                                {% for dificultad in dificultades %}
+                                    <option value="{{ dificultad.id }}">{{ dificultad.descripcion }}</option>
+                                {%  endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="temporada" class="control-label"> Temporada: </label>
+                            <select id="temporada" name="temporada" class="form-control">
+                                {% for temporada in temporadas %}
+                                    <option value="{{ temporada.id }}">{{ temporada.nombre }}</option>
+                                {%  endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="grupoAlimenticio" class="control-label"> Grupo Alimenticio: </label>
+                            <select id="grupoAlimenticio" name="grupoAlimenticio" class="form-control">
+                                {% for grupo in gruposAlimenticios %}
+                                    <option value="{{ grupo.id }}">{{ grupo.nombre }}</option>
+                                {%  endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="clasificacion" class="control-label"> Clasificación: </label>
+                            <div class="panel panel-default">
+                                <div class="panel-body" id="clasificacion">
+                                    {% for clasificacion in clasificaciones %}
+                                        <input type="checkbox" id="{{ clasificacion.id }}"  name="{{ clasificacion.id }}"> {{ clasificacion.descripcion }} <br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="condimentos" class="control-label"> Condimentos - <i>(Cantidad a gusto)</i>: </label>
+                            <div class="panel panel-default">
+                                <div class="panel-body" id="condimentos">
+                                    {% for condimento in condimentos %}
+                                        <input type="checkbox" id="{{ condimento.id }}"  name="{{ condimento.id }}"> {{ condimento.nombre }} <br>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div style="height: 800px;" class="right">
+
+                <div class="panel panel-primary" style="height: 100%">
+
+                    <div class="panel-heading">
+                        <label class="panel-title"> Ingredientes y Condimentos </label>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="panel panel-default left-half">
+
+                            <div class="panel-heading">
+                                <label class="panel-title"> Buscador de Ingredientes </label>
+                            </div>
+
+                            <div class="panel-heading">
+                                <label for="ingrediente-input" class="control-label">Ingrediente a buscar:</label>
+                                <input type="text" id="ingrediente-input" class="input-sm" placeholder="Nombre del ingrediente">
+                            </div>
+
+                            <div id="ingredientesDisponibles" class="panel-body" style=" height: 630px; overflow-y: scroll;">
+                                {% for ingrediente in ingredientes %}
+                                    <div>
+                                        <button id="{{ ingrediente.id }}" class="btn btn-lg ingrediente" name="{{ ingrediente.unidad }}"  value="{{ ingrediente.nombre }}" style="width: 100%; margin-bottom: 10px">
+                                            {{ ingrediente.nombre }}
+                                            <i class="fa fa-caret-square-o-right pull-right"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+
+                        <div class="panel panel-default right-half">
+
+                            <div class="panel-heading">
+                                <label class="panel-title"> Ingredientes de la receta </label>
+                            </div>
+
+                            <div class="panel-body" style=" height: 680px; overflow-y: scroll;">
+                                <div id="ingrediente-container">
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <div style="width: 100%; clear:both; padding-top: 20px;">
+
+        <div class="panel panel-primary">
+
+            <div class="panel-heading">
+                <label class="panel-title">Pasos</label>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="form-group">
+                    <label for="paso1" class="label-control">Paso 1:</label>
+                    <textarea id="paso1" class="form-control"></textarea>
+                    <input class="form-control" id="foto1" type="text" placeholder="URL de la foto correspondiente al paso 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="paso2" class="label-control">Paso 2:</label>
+                    <textarea id="paso2" class="form-control"></textarea>
+                    <input class="form-control" id="foto2" type="text" placeholder="URL de la foto correspondiente al paso 2">
+                </div>
+
+                <div class="form-group">
+                    <label for="paso3" class="label-control">Paso 3:</label>
+                    <textarea id="paso3" class="form-control"></textarea>
+                    <input class="form-control" id="foto3" type="text" placeholder="URL de la foto correspondiente al paso 3">
+                </div>
+
+                <div class="form-group">
+                    <label for="paso4" class="label-control">Paso 4:</label>
+                    <textarea id="paso4" class="form-control"></textarea>
+                    <input class="form-control" id="foto4" type="text" placeholder="URL de la foto correspondiente al paso 4">
+                </div>
+
+                <div class="form-group">
+                    <label for="paso5" class="label-control">Paso 5:</label>
+                    <textarea id="paso5" class="form-control"></textarea>
+                    <input class="form-control" id="foto5" type="text" placeholder="URL de la foto correspondiente al paso 5">
+                </div>
+
+
+            </div>
+
+            <div class="panel-footer">
+
+                <div class="form-group" style="text-align: right">
+                    <button type="button" id="submit" class="btn btn-primary" >Guardar Receta</button>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+{% endblock body_container_main %}
+
+{% block body_js %}
+
+    {{ parent() }}
+    
+    <script type="text/javascript">
+    	
+		$(document).ready(function() {
+
+            $(document).on('click', '.ingrediente-agregado', function(){
+                $("#ingredientesDisponibles").find("button[value='"+this.value+"']").removeClass('hide');
+                $(this).parent().remove();
+            });
+
+            $(".ingrediente").click(function(e){
+                e.preventDefault();
+                $(this).addClass('hide');
+                var ingredienteTemplate = '<div><button value="'+this.value+'" type="button" id="'+this.id+'" class="btn btn-lg ingrediente-agregado" style="width: 70%; margin-bottom: 10px">'+this.value+'</button><input style="width:100px; margin-left: 20px" type=number id=cant'+this.id+'>'+this.name+'</div>';
+                $("#ingrediente-container").append(ingredienteTemplate);
+            });
+
+            $("#submit").click(function(){
+
+                app.showLoading("Guardando nueva receta");
+
+                var nombre = $("#nombre").val();
+                var dificultad = $("#dificultad").val();
+                var temporada = $("#temporada").val();
+                var grupoAlimenticio = $("#grupoAlimenticio").val();
+                var ingredientes = [];
+                $("#ingrediente-container button").each(
+                        function(){
+                            var ing = {};
+                            ing.id = this.id;
+                            ing.cant = $("#cant"+ing.id).val();
+                            ingredientes.push(ing);
+                        }
+                );
+
+                var condimentos = [];
+                $("#condimentos input:checked").each(function(){ condimentos.push(this.id); });
+
+                var clasificaciones = [];
+                $("#clasificacion input:checked").each(function(){ clasificaciones.push(this.id); });
+
+                var paso1 = $("#paso1").val();
+                var paso2 = $("#paso2").val();
+                var paso3 = $("#paso3").val();
+                var paso4 = $("#paso4").val();
+                var paso5 = $("#paso5").val();
+
+                var foto1 = $("#foto1").val();
+                var foto2 = $("#foto2").val();
+                var foto3 = $("#foto3").val();
+                var foto4 = $("#foto4").val();
+                var foto5 = $("#foto5").val();
+
+                $.ajax({
+                    type: 'POST',
+                    data:{
+                        nombre: nombre,
+                        dificultad: dificultad,
+                        temporada: temporada,
+                        grupoAlimenticio: grupoAlimenticio,
+                        ingredientes: ingredientes,
+                        clasificaciones: clasificaciones,
+                        condimentos: condimentos,
+                        paso1: paso1,
+                        paso2: paso2,
+                        paso3: paso3,
+                        paso4: paso4,
+                        paso5: paso5,
+                        foto1: foto1,
+                        foto2: foto2,
+                        foto3: foto3,
+                        foto4: foto4,
+                        foto5: foto5
+                    },
+                    url: "{{ action }}"
+                }).success(function(data, textStatus, jqXHR){
+                    app.hideLoading();
+                    window.location.href = data;
+                });
+
+            })
+
+		});
+
+	</script>	
+
+{% endblock body_js %}
+

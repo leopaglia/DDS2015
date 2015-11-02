@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\AppBundle;
 use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,8 +13,11 @@ use Symfony\Component\HttpFoundation\Session;
 use AppBundle\Entity\Usuario;
 use AppBundle\Entity\Receta;
 use AppBundle\Entity\Historial;
+use AppBundle\Entity\IngredienteReceta;
 
 class RecetasController extends BasicController{
+
+    // ------------ RENDERS ------------
 
 	/**
      * @Route("/seleccionarRecetas", name="seleccionarRecetas")
@@ -25,6 +29,8 @@ class RecetasController extends BasicController{
 
         $data['temporadas'] = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
         $data['dificultades'] = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
+        $data['clasificaciones'] = $this->getDoctrine()->getRepository("AppBundle:Clasificacion")->findAll();
+        $data['gruposAlimenticios'] = $this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->findAll();
         $data['url']['agregarAPerfil'] = $this->generateUrl('agregarAPerfil');
 
 	    return $this->render('Default/seleccionarRecetas.html.twig', array("title" => "Seleccionar Recetas", "data" => $data));
@@ -39,31 +45,101 @@ class RecetasController extends BasicController{
         return $this->render('Default/reportes.html.twig', array("title" => "Reportes"));
 
     }
-    
+
+    /**
+     * @Route("/cargarReceta", name="generateRecipe")
+     */
+    public function generarRecetaAction(){
+
+        $data = [];
+        $data["title"] = "Cargar nueva receta";
+        $data['action'] = $this->generateUrl('saveRecipe');
+
+        $data['dificultades'] = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
+        $data['temporadas'] = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
+        $data['gruposAlimenticios'] = $this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->findAll();
+        $data['ingredientes'] = $this->getDoctrine()->getRepository("AppBundle:Ingrediente")->findAll();
+        $data['condimentos'] = $this->getDoctrine()->getRepository("AppBundle:Condimento")->findAll();
+        $data['clasificaciones'] = $this->getDoctrine()->getRepository("AppBundle:Clasificacion")->findAll();
+
+
+        return $this->render("default/nuevaReceta.html.twig", $data);
+    }
+
+    /**
+     * @Route("/verReceta/{id}", name="verReceta")
+     */
+    public function verRecetaAction($id){
+
+        $em = $this->getDoctrine()->getManager();
+        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($this->getUser());
+        $receta = $this->getDoctrine()->getRepository('AppBundle:Receta')->find($id);
+
+        $arrayReceta = array();
+
+        $arrayReceta["nombre"] = $receta->getNombre();
+        $arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
+        $arrayReceta["dificultad"] = $receta->getDificultad();
+        $arrayReceta["calorias"] = "muchas";
+        $arrayReceta["calificacion"] = $receta->getCalificacion();
+
+        $arrayReceta["paso1"] = $receta->getPaso1();
+        $arrayReceta["paso2"] = $receta->getPaso2();
+        $arrayReceta["paso3"] = $receta->getPaso3();
+        $arrayReceta["paso4"] = $receta->getPaso4();
+        $arrayReceta["paso5"] = $receta->getPaso5();
+
+        $arrayReceta["foto1"] = $receta->getFoto1();
+        $arrayReceta["foto2"] = $receta->getFoto2();
+        $arrayReceta["foto3"] = $receta->getFoto3();
+        $arrayReceta["foto4"] = $receta->getFoto4();
+        $arrayReceta["foto5"] = $receta->getFoto5();
+
+        $historial = new Historial($user, $receta, 0);
+
+        $em->persist($historial);
+        $em->flush();
+
+        return $this->render("default/receta.html.twig", $arrayReceta);
+    }
+
+
+    // ------------ ACTIONS ------------
+
 
     /**
      * @Route("/buscarRecetas", name="buscarRecetas")
      */
     public function buscarRecetasAction(Request $request){
 
-        $dni = $this->getUser();
-        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+        $id = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($id);
 
         $filtros = array();
 
-        $filtros['ingrediente'] = $request->request->get('ingrediente');
+        $filtros['nombre'] = $request->request->get('nombre');
         $filtros['temporada'] = $request->request->get('temporada');
         $filtros['dificultad'] = $request->request->get('dificultad');
-        $filtros['caloriasDesde'] = $request->request->get('caloriasDesde');
-        $filtros['caloriasHasta'] = $request->request->get('caloriasHasta');
+        $filtros['clasificacion'] = $request->request->get('clasificacion');
+        $filtros['grupoAlimenticio'] = $request->request->get('grupoAlimenticio');
+        $filtros['owner'] = $request->request->get('owner');
 
-    	$recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetasByFilters($filtros, $user);
+        $caloriasDesde = $request->request->get('caloriasDesde');
+        $caloriasHasta = $request->request->get('caloriasHasta');
+
+        $acceptVisitors = true;
+        if ($filtros['owner'] == 'me') $acceptVisitors = false; //si busco mis recetas, que no las filtre
+
+    	$recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetasByFilters($filtros, $user, $acceptVisitors);
     	
 		$arrayRecetas = array();
 
         if (!empty($recetas)) {
 
             foreach($recetas as $receta){
+
+                if( ! ($this->caloriasEnRango($receta, $caloriasDesde, $caloriasHasta)) )
+                    continue;
 
                 $arrayReceta = array();
 
@@ -73,8 +149,7 @@ class RecetasController extends BasicController{
                 $arrayReceta["nombre"] = '<a href="'.$url.'">'.$receta->getNombre().'</a>';
                 $arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
                 $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
-//                $arrayReceta["calorias"] = $receta->getCalorias(); //TODO
-                $arrayReceta["calorias"] = "bocha";
+                $arrayReceta["calorias"] = $this->calcularCalorias($receta);
                 $arrayReceta["calificacion"] = $receta->getCalificacion();
 
                 $arrayRecetas[] = $arrayReceta;
@@ -90,8 +165,8 @@ class RecetasController extends BasicController{
      */
     public function generarReporteAction(Request $request){
 
-        $dni = $this->getUser();
-        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+        $id = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($id);
 
         $filtros = array();
 
@@ -115,9 +190,8 @@ class RecetasController extends BasicController{
                 $arrayReceta["nombre"] = '<a href="'.$url.'">'.$receta->getNombre().'</a>';
                 $arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
                 $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
-//                $arrayReceta["calorias"] = $receta->getCalorias(); //TODO
-                $arrayReceta["calorias"] = "bocha";
-//                $arrayReceta["calificacion"] = $receta->getCalificacion();
+                $arrayReceta["calorias"] = $this->calcularCalorias($receta);
+                $arrayReceta["calificacion"] = $receta->getCalificacion();
 
                 $arrayRecetas[] = $arrayReceta;
             }
@@ -127,92 +201,6 @@ class RecetasController extends BasicController{
         return new JsonResponse($arrayRecetas);
     }
 
-    /**
-     * @Route("/verReceta/{id}", name="verReceta")
-     */
-    public function verRecetaAction($id){
-
-        $em = $this->getDoctrine()->getManager();
-        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($this->getUser());
-    	$receta = $this->getDoctrine()->getRepository('AppBundle:Receta')->find($id);
-    	 
-    	$arrayReceta = array();
-    			
-    	$arrayReceta["nombre"] = $receta->getNombre();
-    	$arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
-    	$arrayReceta["dificultad"] = $receta->getDificultad();
-    	$arrayReceta["calorias"] = "muchas";
-    	$arrayReceta["calificacion"] = $receta->getCalificacion();
-
-        $arrayReceta["paso1"] = $receta->getPaso1();
-        $arrayReceta["paso2"] = $receta->getPaso2();
-        $arrayReceta["paso3"] = $receta->getPaso3();
-        $arrayReceta["paso4"] = $receta->getPaso4();
-        $arrayReceta["paso5"] = $receta->getPaso5();
-
-        $arrayReceta["foto1"] = $receta->getFoto1();
-        $arrayReceta["foto2"] = $receta->getFoto2();
-        $arrayReceta["foto3"] = $receta->getFoto3();
-        $arrayReceta["foto4"] = $receta->getFoto4();
-        $arrayReceta["foto5"] = $receta->getFoto5();
-
-        $historial = new Historial($user, $receta);
-
-        $em->persist($historial);
-        $em->flush();
-    	 
-    	return $this->render("default/receta.html.twig", $arrayReceta);
-    }
-    
-    /**
-     * @Route("/cargarReceta", name="generateRecipe")
-     */
-    public function generarRecetaAction(){
-
-        $data = [];
-        $data["title"] = "Cargar nueva receta";
-        $data['dificultades'] = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
-        $data['temporadas'] = $this->getDoctrine()->getRepository("AppBundle:Temporada")->findAll();
-        $data['ingredientes'] = $this->getDoctrine()->getRepository("AppBundle:Ingrediente")->findAll();
-        $data['condimentos'] = $this->getDoctrine()->getRepository("AppBundle:Condimento")->findAll();
-        $data['condiciones'] = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
-
-    	
-/*		$fieldsets = array(
-
-     			array("title" => "Tipo de receta", "fields" => array(
-     					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese nombre"),
-     					array("label" => "Dificultad", "type" => "select", "idName" => "dificultad", "options" => $arrayDificultades),
-     					array("label" => "Temporada", "type" => "select", "idName" => "temporada", "options" => $arrayTemporadas),
-     			)),
-
-				array("title" => "Clasificacion", "fields" => array(
-						array("label" => "Clasificacion", "type" => "select", "idName" => "clasificacion", "options" => $arrayClasificaciones),
-				)),
-
-     			array("title" => "Ingredientes", "fields" => array(
-     					array("label" => "Ingredientes", "type" => "select", "idName" => "ingredientes", "options" => $arrayIngredientes),
-     			)),
-
-				array("title" => "Condimentos", "fields" => array(
-						array("label" => "Condimentos", "type" => "select", "idName" => "condimentos", "options" => $arrayCondimentos),
-				)),
-
-
-     	);
-
-    	$buttons = array(
-    			array("type" => "submit", "text" => "Guardar")
-    	);
-
-    	$config = array(
-    			"display"   => "accordion",
-    			"routename" => "saveRecipe",
-    	);*/
-    	 
-    	return $this->render("recetas/nuevaReceta.html.twig", $data);
-    }
-    
     
     /**
      * @Route("/guardarReceta", name="saveRecipe")
@@ -221,20 +209,39 @@ class RecetasController extends BasicController{
     	
     	$em = $this->getDoctrine()->getManager();
     	 
-    	$dni = $this->getUser();
-    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+    	$idUsuario = $this->getUser();
+    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($idUsuario);
     	
-    	$receta = new Receta();
-    	 
     	$nombre = $request->request->get("nombre");
     	$dificultad = $request->request->get("dificultad");
     	$temporada = $request->request->get("temporada");
     	$ingredientes = $request->request->get("ingredientes");
-    	$condimentos = $request->request->get("condimentos");
-    	 
+    	$grupoAlimenticio = $request->request->get("grupoAlimenticio");
+        $clasificaciones = $request->request->get("clasificaciones");
+
+        $foto1 = $request->request->get("foto1");
+        $foto2 = $request->request->get("foto2");
+        $foto3 = $request->request->get("foto3");
+        $foto4 = $request->request->get("foto4");
+        $foto5 = $request->request->get("foto5");
+
+        $paso1 = $request->request->get("paso1");
+        $paso2 = $request->request->get("paso2");
+        $paso3 = $request->request->get("paso3");
+        $paso4 = $request->request->get("paso4");
+        $paso5 = $request->request->get("paso5");
+
+        $receta = new Receta();
+
     	$em->beginTransaction();
     	 
     	try{
+
+            $receta->setPaso1("default"); //not null
+
+            // flushing to generate id
+            $em->persist($receta);
+            $em->flush();
 
             if(!empty($nombre))
                 $receta->setNombre($nombre);
@@ -246,20 +253,51 @@ class RecetasController extends BasicController{
     			$receta->setTemporada($this->getDoctrine()->getRepository("AppBundle:Temporada")->find($temporada));
 
      		if(!empty($ingredientes))
-     			foreach($ingredientes as $ingrediente)
-     				$receta->addIdingrediente($this->getDoctrine()->getRepository("AppBundle:ingrediente")->find($ingrediente));
+     			foreach($ingredientes as $ing){
+                    $ingrediente = $this->getDoctrine()->getRepository("AppBundle:Ingrediente")->find($ing['id']);
+
+                    $ingrediente_receta = new IngredienteReceta();
+                    $ingrediente_receta->setIngrediente($ingrediente);
+                    $ingrediente_receta->setReceta($receta);
+                    $ingrediente_receta->setcantidad($ing['cant']);
+
+                    $em->persist($ingrediente_receta);
+
+                }
 
             if(!empty($condimentos))
-                foreach($condimentos as $condimento)
-                    $receta->addIdcondimento($this->getDoctrine()->getRepository("AppBundle:Condimento")->find($condimento));
+                foreach($condimentos as $condimento_id){
+                    $condimento = $this->getDoctrine()->getRepository("AppBundle:Condimento")->find($condimento_id);
+                    $receta->addIdcondimento($condimento);
+                    $condimento->addIdrecetum($receta);
+                }
+
+            if(!empty($clasificaciones))
+                foreach($clasificaciones as $clasificacion_id){
+                    $clasificacion = $this->getDoctrine()->getRepository("AppBundle:Clasificacion")->find($clasificacion_id);
+                    $receta->addIdClasificacion($clasificacion);
+                    $clasificacion->addIdrecetum($receta);
+                }
 
 
-            $receta->setPaso1("ASDASD");
+            if(!empty($grupoAlimenticio))
+                $receta->setGrupoAlim($this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->find($grupoAlimenticio));
+
+            $receta->setIdUsuario($user);
+
+            $receta->setPaso1($paso1);
+            $receta->setPaso2($paso2);
+            $receta->setPaso3($paso3);
+            $receta->setPaso4($paso4);
+            $receta->setPaso5($paso5);
+
+            $receta->setFoto1($foto1);
+            $receta->setFoto2($foto2);
+            $receta->setFoto3($foto3);
+            $receta->setFoto4($foto4);
+            $receta->setFoto5($foto5);
+
             $receta->setCalificacion(3);
-
-
-            $user->addIdreceta($receta);
-            $receta->addIdusuario($user);
 
             $em->persist($receta);
             $em->flush();
@@ -288,14 +326,94 @@ class RecetasController extends BasicController{
         $receta = $this->getDoctrine()->getRepository("AppBundle:Receta")->find($idReceta);
         $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
 
-        $historial = new Historial($user, $receta);
-        $historial->setAceptada(1);
+        $historial = new Historial($user, $receta, 1);
 
         $em->persist($historial);
         $em->flush();
 
         return new Response("");
 
+    }
+
+    /**
+     * @Route("/eliminarReceta", name="eliminarReceta")
+     */
+    public function eliminarRecetaAction(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+
+        $id = $request->request->get('id');
+        $receta = $this->getDoctrine()->getRepository("AppBundle:Receta")->find($id);
+
+        $clasificaciones = $receta->getIdClasificacion();
+        $condimentos = $receta->getIdcondimento();
+        $ingredientes = $receta->getIdingrediente();
+
+        $historiales = $this->getDoctrine()->getRepository("AppBundle:Historial")->findByIdreceta($id);
+
+        foreach ($clasificaciones as $c){
+            $c->removeIdRecetum($receta);
+            $receta->removeIdClasificacion($c);
+        }
+
+        foreach ($condimentos as $c) {
+            $c->removeIdRecetum($receta);
+            $receta->removeIdcondimento($c);
+        }
+
+        foreach ($ingredientes as $i) {
+            $i->removeIdRecetum($receta);
+            $receta->removeIdingrediente($i);
+        }
+
+        foreach ($historiales as $h){
+            $em->remove($h);
+        }
+
+        $em->persist($receta);
+        $em->flush();
+
+        $em->remove($receta);
+        $em->flush();
+
+        return new Response("");
+
+    }
+
+    // ------------------ PRIVATE --------------------
+
+    private function calcularCalorias(Receta $receta) {
+
+        $ingredientes = $receta->getIdingrediente()->toArray();
+
+        $ac = 0;
+        foreach($ingredientes as $i) {
+
+            $ing_rec = $this->getDoctrine()->getRepository("AppBundle:IngredienteReceta")->findOneBy(array("idreceta" => $receta, "idingrediente" => $i));
+            $cantidad = $ing_rec->getcantidad();
+
+            $cantidad_porcion = $i->getPorcion();
+            $caloriasPorcion = $i->getCaloriasPorcion();
+
+            $ac += ($cantidad/$cantidad_porcion) * $caloriasPorcion;
+
+        }
+
+        return $ac;
+    }
+
+    private function caloriasEnRango(Receta $receta, $caloriasDesde, $caloriasHasta) {
+
+        if (empty($caloriasDesde) && empty($caloriasHasta))
+            return true;
+
+        if(empty($caloriasDesde))
+            return ($this->calcularCalorias($receta) < $caloriasHasta);
+
+        if(empty($caloriasHasta))
+            return ($this->calcularCalorias($receta) > $caloriasDesde);
+
+        return ($this->calcularCalorias($receta) > $caloriasDesde) && ($this->calcularCalorias($receta) < $caloriasHasta);
     }
 
 }

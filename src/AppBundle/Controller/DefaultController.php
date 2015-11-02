@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
 
+use AppBundle\Entity\Receta;
+
 
 class DefaultController extends Controller
 {
@@ -18,9 +20,52 @@ class DefaultController extends Controller
      */
     public function indexAction(){
 
-    	return $this->render('default/index.html.twig', array( "title"                 => "DDS 2015",
-                                                     "seleccionarRecetasURL" => "seleccionarRecetas",
-                                                     "estadisticasURL"       => "estadisticas"
-    	));
+        $id = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($id);
+
+        if(!$user->getUltimaActualizacion()){
+            //$session->getFlashBag()->add('notice', "Bienvenido/a al sitio! Completa tu perfil antes de continuar.");
+            return $this->redirect($this->generateUrl('modifyProfile'))->sendHeaders();
+        }
+
+        $data = array();
+        $data['ranking'] = Array();
+        $data['recomendados'] = array();
+
+        //data[recomendados]
+
+        $recetas = $this->getDoctrine()->getRepository("AppBundle:Receta")->getRecomendaciones($user);
+        foreach($recetas as $receta) {
+            $arrayReceta = array();
+
+            $arrayReceta["receta"]["nombre"] = $receta->getNombre();
+            $arrayReceta["receta"]["url"] = $this->generateUrl('verReceta', array('id' => $receta->getId()));
+            $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
+
+            $data['recomendados'][] = $arrayReceta;
+        }
+
+        //data[ranking]
+
+        $topRecetas = $this->getDoctrine()->getRepository("AppBundle:Receta")->getTopRecetas(10);
+        foreach($topRecetas as $receta) {
+            $arrayReceta = array();
+
+            $arrayReceta["receta"]["nombre"] = $receta[0]->getNombre();
+            $arrayReceta["receta"]["url"] = $this->generateUrl('verReceta', array('id' => $receta[0]->getId()));
+            $arrayReceta["visitas"] = $receta["views"];
+
+            $data['ranking'][] = $arrayReceta;
+        }
+
+        // usuarios para crear grupo
+        $data['usuarios'] = $this->getDoctrine()->getRepository("AppBundle:Usuario")->findAll();
+
+        //saca al user logueado
+        if(($key = array_search($id, $data['usuarios'])) !== false) {
+            unset($data['usuarios'][$key]);
+        }
+
+    	return $this->render('default/index.html.twig', array("data" => $data));
     }    
 }

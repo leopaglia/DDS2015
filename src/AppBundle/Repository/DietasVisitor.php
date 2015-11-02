@@ -3,13 +3,14 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Entity\CondicionesDeSalud as Condicion;
+use AppBundle\Entity\Dieta as Dieta;
 use AppBundle\Constants\EnfermedadesConstants as Enfermedades;
 use AppBundle\Entity\CondicionesDeSalud;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Proxies\__CG__\AppBundle\Entity\GruposAlimenticios;
 
-class EnfermedadesVisitor implements IVisitor {
+class DietasVisitor implements IVisitor {
 
     public function visit (IVisitableRepository $repository){
 
@@ -17,24 +18,27 @@ class EnfermedadesVisitor implements IVisitor {
         $qb = $repository->qb;
         $em = $repository->em;
 
-        foreach($user->getIdcondiciones()->getValues() as $enfermedad)
-            $qb = $this->addFilter($qb, $em, $enfermedad);
+        $dieta = $user->getDieta();
+
+        if(!$dieta) return $qb;
+
+        $qb = $this->addFilter($qb, $em, $dieta);
 
         return $qb;
 
     }
 
-    private function addFilter(QueryBuilder $qb, EntityManager $em, Condicion $enfermedad ){
+    private function addFilter(QueryBuilder $qb, EntityManager $em, Dieta $dieta ){
 
         $qb_aux = $em->createQueryBuilder();
 
-        $condicion = $qb_aux  ->select("c")
-            ->from("AppBundle:CondicionesDeSalud", "c")
-            ->where($qb_aux->expr()->eq("c.nombre", ":nombre"))
-            ->setParameter("nombre", $enfermedad->getNombre())
+        $d = $qb_aux  ->select("d")
+            ->from("AppBundle:Dieta", "d")
+            ->where($qb_aux->expr()->eq("d.nombre", ":nombre"))
+            ->setParameter("nombre", $dieta->getNombre())
             ->getQuery()->getResult();
 
-        $condicion = $condicion[0];
+        $d = $d[0];
 
         $grupos = $qb_aux ->select("g")
             ->from("AppBundle:GruposAlimenticios", "g")
@@ -43,8 +47,8 @@ class EnfermedadesVisitor implements IVisitor {
         $grupos_prohibidos_ids = array();
         $i = 0;
         foreach ($grupos as $g) {
-            $condiciones = $g->getIdCondicion()->toArray();
-            if (in_array($condicion, $condiciones)){
+            $dietas = $g->getIdDieta()->toArray();
+            if (in_array($d, $dietas)){
                 $grupos_prohibidos_ids[] = $g->getId();
             }
             $i++;

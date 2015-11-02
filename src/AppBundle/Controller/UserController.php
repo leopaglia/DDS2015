@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use Proxies\__CG__\AppBundle\Entity\Grupo;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,15 +16,51 @@ use AppBundle\Entity\CondicionesDeSalud;
 use AppBundle\Entity\Rutina;
 
 use AppBundle\Repository\GenericRepository as GenericRepository;
+use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\DateTime;
 
 class UserController extends BasicController{
 
-	/**
-	 * @Route("/perfil", name="profile")
-	 */
-	public function profileAction(){
-		return $this->render("default/perfil.html.twig");	
-	}
+
+    /**
+     * @Route("/misRecetas", name="myRecipes")
+     */
+    public function mostrarRecetasAction(){
+
+        $data['title'] = "Mis recetas";
+
+
+
+        return $this->render("default/misRecetas.html.twig", $data);
+    }
+
+    /**
+     * @Route("/misGrupos", name="myGroups")
+     */
+    public function mostrarGruposAction(){
+
+        $dni = $this->getUser();
+        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($dni);
+
+        $grupos = $user->getIdgrupo()->getValues();
+
+        $arrayGrupos = [];
+        foreach ($grupos as $grupo){
+            $nombre = $grupo->getNombre();
+            $users = $grupo->getIdusuario()->getValues();
+
+            $aux = [];
+            $aux['nombre'] = $nombre;
+            $aux['users'] = $users;
+
+            $arrayGrupos[] = $aux;
+        }
+
+        $data['title'] = "Mis grupos";
+        $data['grupos'] = $arrayGrupos;
+
+        return $this->render("default/grupos.html.twig", $data);
+    }
 	
 	/**
      * @Route("/modificarPerfil", name="modifyProfile")
@@ -32,69 +69,128 @@ class UserController extends BasicController{
     	
     	//Datos
 
-            //Generales
+        //Generales
 
-            $complexiones = $this->getDoctrine()->getRepository("AppBundle:Complexion")->findAll();
-            $condiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
-            $rutinas = $this->getDoctrine()->getRepository("AppBundle:Rutina")->findAll();
+        $complexiones = $this->getDoctrine()->getRepository("AppBundle:Complexion")->findAll();
+        $condiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
+        $rutinas = $this->getDoctrine()->getRepository("AppBundle:Rutina")->findAll();
+        $dietas = $this->getDoctrine()->getRepository("AppBundle:Dieta")->findAll();
+        $gruposAlimenticios = $this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->findAll();
 
-            $arrayComplexiones = array();
-            $arrayCondiciones = array();
-            $arrayRutinas = array();
+        $arrayComplexiones = array();
+        $arrayCondiciones = array();
+        $arrayRutinas = array();
+        $arrayDietas = array();
+        $arrayGruposAlimenticios = array();
 
-            foreach ($complexiones as $c){
-                $arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
+        foreach ($complexiones as $c){
+            $arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
+        }
+        foreach ($condiciones as $c){
+            $arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId(), "checked" => false);
+        }
+        foreach ($rutinas as $r){
+            $arrayRutinas[] = array("name" => $r->getNombre(), "value" => $r->getId());
+        }
+        foreach ($dietas as $d){
+            $arrayDietas[] = array("name" => $d->getNombre(), "value" => $d->getId());
+        }
+        foreach ($gruposAlimenticios as $g){
+            $arrayGruposAlimenticios[] = array("name" => $g->getNombre(), "value" => $g->getId(), "checked" => false);
+        }
+
+        //Usuario
+
+        $id = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($id);
+
+        //Datos del usuario (Para campo checked de los checklist)
+
+        $condicionesPresentes = $user->getIdcondiciones()->getValues(); //array de objetos CondicionesDeSalud
+
+        foreach($condiciones as $cnd){
+
+            if(in_array($cnd, $condicionesPresentes)){ //busco la condicion y pongo en true el campo checked en el array que voy a mandar al html
+
+                $index = array_search(array("name" => $cnd->getNombre(), "value" => $cnd->getId(), "checked" => false), $arrayCondiciones);
+
+                if($index !== false) $arrayCondiciones[$index]["checked"] = true;
+
             }
-            foreach ($condiciones as $c){
-                $arrayCondiciones[] = array("name" => $c->getNombre(), "value" => $c->getId(), "checked" => false);
-            }
-            foreach ($rutinas as $r){
-                $arrayRutinas[] = array("name" => $r->getNombre(), "value" => $r->getId());
-            }
 
-            //Usuario
+        }
 
-            $dni = $this->getUser();
-            $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+        $grupos = $user->getIdGrupoalim()->getValues(); //array de objetos CondicionesDeSalud
 
-            //Datos del usuario (Para campo checked de los checklist)
+        foreach($grupos as $gr){
 
-            $condicionesPresentes = $user->getIdcondiciones()->getValues(); //array de objetos CondicionesDeSalud
+            if(in_array($gr, $grupos)){ //busco la condicion y pongo en true el campo checked en el array que voy a mandar al html
 
-            foreach($condiciones as $cnd){
+                $index = array_search(array("name" => $gr->getNombre(), "value" => $gr->getId(), "checked" => false), $arrayGruposAlimenticios);
 
-                if(in_array($cnd, $condicionesPresentes)){ //busco la condicion y pongo en true el campo checked en el array que voy a mandar al html
-
-                    $index = array_search(array("name" => $cnd->getNombre(), "value" => $cnd->getId(), "checked" => false), $arrayCondiciones);
-
-                    if($index !== false) $arrayCondiciones[$index]["checked"] = true;
-
-                }
+                if($index !== false) $arrayGruposAlimenticios[$index]["checked"] = true;
 
             }
+
+        }
+
+        //para que seleccione si hay datos cargados
+
+        $nombre = '';
+        $apellido = '';
+        $edad = '';
+        $altura = '';
+        $rutina_id = '';
+        $complexion_id  = '';
+        $dieta_id = '';
+
+        if ($user->getNombre())
+            $nombre = $user->getNombre();
+
+        if ($user->getApellido())
+            $apellido = $user->getApellido();
+
+        if ($user->getEdad())
+            $edad = $user->getEdad();
+
+        if ($user->getAltura())
+            $altura = $user->getAltura();
+
+        if ($user->getRutina())
+            $rutina_id = $user->getRutina()->getId();
+
+        if ($user->getComplexion())
+            $complexion_id = $user->getComplexion()->getId();
+
+        if ($user->getDieta())
+            $dieta_id = $user->getDieta()->getId();
 
 
      	//Vista
-     	
+
      	$fieldsets = array(
      		
      			array("title" => "Detalle de Usuario", "fields" => array(
-     					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese su Nombre", "value" => $user->getNombre()),
-     					array("label" => "Apellido", "type" => "input", "idName" => "apellido", "placeholder" => "Ingrese su Apellido", "value" => $user->getApellido()),
-     					array("label" => "Edad", "type" => "input", "idName" => "edad", "placeholder" => "Ingrese su Edad", "value" => $user->getEdad()),
-     					array("label" => "Altura", "type" => "input", "idName" => "altura", "placeholder" => "Ingrese su Altura (en centimetros)", "value" => $user->getAltura()),
-     					array("label" => "Rutina", "type" => "select", "idName" => "rutina", "options" => $arrayRutinas, "value" => $user->getRutina()->getId())
+     					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese su Nombre", "value" => $nombre),
+     					array("label" => "Apellido", "type" => "input", "idName" => "apellido", "placeholder" => "Ingrese su Apellido", "value" => $apellido),
+     					array("label" => "Edad", "type" => "input", "idName" => "edad", "placeholder" => "Ingrese su Edad", "value" => $edad),
+     					array("label" => "Altura", "type" => "input", "idName" => "altura", "placeholder" => "Ingrese su Altura (en centimetros)", "value" => $altura),
+                        array("label" => "Complexion", "type" => "select", "idName" => "complexion", "options" => $arrayComplexiones, "value" => $complexion_id),
      			)),
-     					
-     			array("title" => "Complexion", "fields" => array(
-     					array("label" => "Complexion", "type" => "select", "idName" => "complexion", "options" => $arrayComplexiones, "value" => $user->getComplexion()->getId()),
-     			)),
-     			
+
+                array("title" => "Dieta y Rutina", "fields" => array(
+                    array("label" => "Rutina", "type" => "select", "idName" => "rutina", "options" => $arrayRutinas, "value" => $rutina_id),
+                    array("label" => "Dieta", "type" => "select", "idName" => "dieta", "options" => $arrayDietas, "value" => $dieta_id)
+                )),
+
+                array("title" => "Grupos Alimenticios", "fields" => array(
+                    array("label" => "Grupos Alimenticios", "type" => "checklist", "idName" => "gruposAlimenticios", "options" => $arrayGruposAlimenticios),
+                )),
+
      			array("title" => "Condiciones Preexistentes", "fields" => array(
      					array("label" => "Condiciones preexistentes", "type" => "checklist", "idName" => "condiciones", "options" => $arrayCondiciones),
      			)),
 
-     			
      	);	
     	
     	$buttons = array(
@@ -116,26 +212,30 @@ class UserController extends BasicController{
      */
     public function updateProfileAction(Request $request){
 
-//        $genericRepository = GenericRepository::getInstance("", $this->getDoctrine());
     	$em = $this->getDoctrine()->getManager();
         $session = $request->getSession();
     	
-    	$dni = $this->getUser();
-    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($dni);
+    	$id = $this->getUser();
+    	$user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($id);
 
         $allCondiciones = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->findAll();
+        $allGruposAlim = $this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->findAll();
     	
     	$nombre = $request->request->get("nombre");
     	$apellido = $request->request->get("apellido");
     	$edad = $request->request->get("edad");
     	$altura = $request->request->get("altura");
     	$rutina = $request->request->get("rutina");
+        $dieta = $request->request->get("dieta");
     	$complexion = $request->request->get("complexion");
-    	$condiciones = $request->request->get("condiciones"); 
-    	
-    	$em->beginTransaction();
+    	$condiciones = $request->request->get("condiciones");
+        $gruposAlimenticios = $request->request->get("gruposAlimenticios");
+
+        $em->beginTransaction();
     	
     	try{
+
+            $user->setUltimaActualizacion(new \DateTime('now'));
     		
     		if(!empty($nombre))
     			$user->setNombre($nombre);
@@ -147,13 +247,15 @@ class UserController extends BasicController{
 	    		$user->setAltura($altura);
     		if(!empty($rutina))
 	    		$user->setRutina($this->getDoctrine()->getRepository("AppBundle:Rutina")->find($rutina));
+            if(!empty($dieta))
+                $user->setDieta($this->getDoctrine()->getRepository("AppBundle:Dieta")->find($dieta));
     		if(!empty($complexion))
 	    		$user->setComplexion($this->getDoctrine()->getRepository("AppBundle:Complexion")->find($complexion));
 
             //borro todas las condiciones
             foreach($allCondiciones as $c){
                 if ($user->getIdcondiciones()->contains($c) ) {
-                    $user->removeCondicion($c);
+                    $user->removeIdcondicione($c);
                     $c->removeIdusuario($user);
                 }
             }
@@ -162,8 +264,26 @@ class UserController extends BasicController{
                 foreach($condiciones as $condicionId){
 
                     $condicion = $this->getDoctrine()->getRepository("AppBundle:CondicionesDeSalud")->find($condicionId);
-                    $user->addCondicion($condicion);
+                    $user->addIdcondicione($condicion);
                     $condicion->addIdusuario($user);
+
+                }
+            }
+
+            //borro todas los grupos
+            foreach($allGruposAlim as $g){
+                if ($user->getIdGrupoalim()->contains($g) ) {
+                    $user->removeIdGrupoalim($g);
+                    $g->removeDni($user);
+                }
+            }
+            //agrego lps que vienen del form
+            if(!empty($gruposAlimenticios)){
+                foreach($gruposAlimenticios as $grupoId){
+
+                    $grupo = $this->getDoctrine()->getRepository("AppBundle:GruposAlimenticios")->find($grupoId);
+                    $user->addIdGrupoalim($grupo);
+                    $grupo->addDni($user);
 
                 }
             }
@@ -174,62 +294,45 @@ class UserController extends BasicController{
     	}catch(\Exception $e){
     		$em->rollback();
 
-            $session->getFlashBag()->add('error', "[DEGUG] ".$e->getMessage());
-
+            //$session->getFlashBag()->add('error', "[DEGUG] ".$e->getMessage());
         }
     	
     	$em->commit();
 
         $session->getFlashBag()->add('notice', "Perfil actualizado exitosamente");
 
-    	return new Response($this->generateUrl("modifyProfile")); //Reload to
+    	return new Response($this->generateUrl("modifyProfile"));
     	
-    }
-    
-    /**
-     * @Route("/buscarUsuario", name="findUser")
-     */
-    public function buscarUsuarioAction(Request $request){
-    	
-    	$nombre = $request->get("nombre");
-    	
-    	$qb = $this->getDoctrine()->getEntityManager()->createQueryBuilder();
-
-		$qb->select("u")
-			->from("AppBundle:Usuario", "u");
-    	
-		if(empty ($nombre) || trim($nombre == "")){
-            return new JsonResponse("");
-		}
-
-        $nombre = trim($nombre);
-        $qb->andWhere($qb->expr()->andx($qb->expr()->eq('u.username', ':nombre')));
-        $qb->setParameter(':nombre', $nombre);
-		
-		$usuario = $qb->getQuery()->getResult();
-        $usuario = $usuario[0];
-
-        $arrayUsuario = array();
-
-		$arrayUsuario["id"] = $usuario->getDni();
-		$arrayUsuario["nombre"] = $usuario->getUsername();
-			
-    	return new JsonResponse($arrayUsuario);
     }
 
     /**
-     * @Route("/misGrupos", name="myGroups")
+     * @Route("/crearGrupo", name="createGroup")
      */
-    public function crearGrupoAction(){
-    	return $this->render("default/perfil.html.twig");
-    }
+    public function crearGrupoAction(Request $request){
 
-    /**
-     * @Route("/misRecetas", name="myRecipes")
-     */
-    public function mostrarRecetasAction(){
-        return $this->render("default/perfil.html.twig");
-    }
+        $userRepo = $this->getDoctrine()->getRepository('AppBundle:Usuario');
+        $em = $this->getDoctrine()->getManager();
 
+        $dni = $this->getUser();
+
+        $dniArray = $request->request->get("usuarios");
+        $dniArray[] = $dni; //agrega al user logueado
+
+        $nombreGrupo = $request->request->get("nombreGrupo");
+
+        $grupo = new Grupo();
+        $grupo->setNombre($nombreGrupo);
+
+        foreach ($dniArray as $d){
+            $user = $userRepo->find($d);
+            $grupo->addIdusuario($user);
+            $user->addIdgrupo($grupo);
+        };
+
+        $em->persist($grupo);
+        $em->flush();
+
+    	return new JsonResponse("");
+    }
 
 }

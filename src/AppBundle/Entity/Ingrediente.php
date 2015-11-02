@@ -34,6 +34,13 @@ class Ingrediente
     private $caloriasPorcion;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="unidad", type="string", length=45, nullable=true)
+     */
+    private $unidad;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -125,6 +132,29 @@ class Ingrediente
     public function getCaloriasPorcion()
     {
         return $this->caloriasPorcion;
+    }
+
+    /**
+     * Set unidad
+     *
+     * @param string $unidad
+     * @return Ingrediente
+     */
+    public function setUnidad($unidad)
+    {
+        $this->unidad = $unidad;
+
+        return $this;
+    }
+
+    /**
+     * Get unidad
+     *
+     * @return string 
+     */
+    public function getUnidad()
+    {
+        return $this->unidad;
     }
 
     /**

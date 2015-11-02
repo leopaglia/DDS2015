@@ -22,13 +22,6 @@ class Temporada
     /**
      * @var integer
      *
-     * @ORM\Column(name="evento_social", type="integer", nullable=true)
-     */
-    private $eventoSocial;
-
-    /**
-     * @var integer
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -58,29 +51,6 @@ class Temporada
     public function getNombre()
     {
         return $this->nombre;
-    }
-
-    /**
-     * Set eventoSocial
-     *
-     * @param integer $eventoSocial
-     * @return Temporada
-     */
-    public function setEventoSocial($eventoSocial)
-    {
-        $this->eventoSocial = $eventoSocial;
-
-        return $this;
-    }
-
-    /**
-     * Get eventoSocial
-     *
-     * @return integer 
-     */
-    public function getEventoSocial()
-    {
-        return $this->eventoSocial;
     }
 
     /**

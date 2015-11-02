@@ -1,10 +1,94 @@
 {% extends "base.html.twig" %}
 
 {% block body_container_main %}
-	
-	<h3><a href="{{ path(seleccionarRecetasURL) }}"> Seleccionar Recetas </a></h3>
 
-    <h3><a href="{{ path(estadisticasURL) }}"> Estadisticas </a></h3>
+    <!-- Reomendaciones diarias -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Que comemos hoy?<i> - Recomendaciones del día</i></h3>
+        </div>
 
-{% endblock body_container_main%}	
+        <div class="panel-body">
+            <table class="table table-bordered">
+                <tr>
+                    <th>Receta</th>
+                    <th style="width: 50%;">Dificultad</th>
+                <tr>
+                    {% for t in data.recomendados %}
+                <tr>
+                    <td><a href="{{ t.receta.url }}">{{ t.receta.nombre }}</a></td>
+                    <td style="width: 50%;">{{ t.dificultad }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 
+    <hr>
+
+    <!-- Ranking -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Ranking<i> - Las recetas más visitadas</i></h3>
+        </div>
+
+        <div class="panel-body">
+            <table id="tablaRanking" class="table table-bordered">
+                <tr>
+                    <th style="width: 50%;">Receta</th>
+                    <th style="width: 50%;">Visitas</th>
+                <tr>
+                    {% for t in data.ranking %}
+                <tr>
+                    <td><a href="{{ t.receta.url }}">{{ t.receta.nombre }}</a></td>
+                    <td>{{ t.visitas }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <!-- Dialogs -->
+    <div id="grupoDialog" title="Crear grupo" class="panel panel-default" style="padding: 10px; margin-bottom: 10px;">
+
+        <div class="panel-body">
+
+            <div class="form-group">
+                <form>
+
+                    <div class="form-group">
+                        <label for="name">Nombre del Grupo:</label>
+                        <div style="float:left; width:95%;">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Ingrese un nombre para el grupo">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label>Usuarios seleccionados:</label>
+                        <div id="seleccionados"></div>
+                    </div>
+
+                    <hr>
+
+                    <label>Agregar usuarios:</label>
+                    <div id="usuarios-disponibles" style="height: 90%; width: 100%; overflow-y: scroll; overflow-x: hidden; ">
+                        {#{% for usuario in usuarios %}#}
+                            {#<button id="{{ usuario.dni }}" class="usuario btn btn-default" type="button" style="width: 90% !important;" value="{{ usuario.nombre }} {{ usuario.apellido }}"> {{ usuario.nombre }} {{ usuario.apellido }} </button>#}
+                        {#{% endfor %}#}
+                    </div>
+
+                    <hr>
+
+                    <button id="confirmarGrupo" class="btn btn-default pull-right" type="button">Crear Grupo</button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+
+{% endblock body_container_main %}

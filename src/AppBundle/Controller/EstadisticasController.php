@@ -22,21 +22,10 @@ class EstadisticasController extends BasicController{
         $data = array();
         $data['url'] = array();
 
-        $data['ranking'] = Array();
         $data['dificultades'] = $this->getDoctrine()->getRepository("AppBundle:Dificultad")->findAll();
         $data['url']['agregarAPerfil'] = $this->generateUrl('agregarAPerfil');
 
-        //cargo data[ranking]
-        $topRecetas = $this->rankingRecetas(10); //doctrine devuelve array,count por tener 2 campos en el select, en array esta la receta  --- me cago en doctrine
-        foreach($topRecetas as $receta) {
-            $arrayReceta = array();
 
-            $arrayReceta["receta"]["nombre"] = $receta[0]->getNombre();
-            $arrayReceta["receta"]["url"] = $this->generateUrl('verReceta', array('id' => $receta[0]->getId()));
-            $arrayReceta["visitas"] = $receta["views"];
-
-            $data['ranking'][] = $arrayReceta;
-        }
 
         return $this->render('Default/estadisticas.html.twig', array("title" => "Estadisticas", "data" => $data));
     }
@@ -77,12 +66,5 @@ class EstadisticasController extends BasicController{
 
         return new JsonResponse($arrayRecetas);
     }
-
-    private function rankingRecetas($count){
-
-        return $this->getDoctrine()->getRepository("AppBundle:Receta")->getTopRecetas($count);
-
-    }
-
 
 }
