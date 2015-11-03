@@ -48,47 +48,4 @@
         </div>
     </div>
 
-    <!-- Dialogs -->
-    <div id="grupoDialog" title="Crear grupo" class="panel panel-default" style="padding: 10px; margin-bottom: 10px;">
-
-        <div class="panel-body">
-
-            <div class="form-group">
-                <form>
-
-                    <div class="form-group">
-                        <label for="name">Nombre del Grupo:</label>
-                        <div style="float:left; width:95%;">
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Ingrese un nombre para el grupo">
-                        </div>
-                    </div>
-
-                    <hr>
-
-                    <div class="form-group">
-                        <label>Usuarios seleccionados:</label>
-                        <div id="seleccionados"></div>
-                    </div>
-
-                    <hr>
-
-                    <label>Agregar usuarios:</label>
-                    <div id="usuarios-disponibles" style="height: 90%; width: 100%; overflow-y: scroll; overflow-x: hidden; ">
-                        {#{% for usuario in usuarios %}#}
-                            {#<button id="{{ usuario.dni }}" class="usuario btn btn-default" type="button" style="width: 90% !important;" value="{{ usuario.nombre }} {{ usuario.apellido }}"> {{ usuario.nombre }} {{ usuario.apellido }} </button>#}
-                        {#{% endfor %}#}
-                    </div>
-
-                    <hr>
-
-                    <button id="confirmarGrupo" class="btn btn-default pull-right" type="button">Crear Grupo</button>
-
-                </form>
-            </div>
-
-        </div>
-
-    </div>
-
-
 {% endblock body_container_main %}

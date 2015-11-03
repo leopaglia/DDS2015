@@ -2,6 +2,10 @@
 
 {% block body_container_main %}
 
+    <a href="#" id="crearGrupo"> <h3>Crear nuevo grupo</h3> </a>
+
+    <hr>
+
     {% for grupo in grupos %}
 
         <div class="accordion">
@@ -10,7 +14,7 @@
 
             <div>
                 {% for user in grupo.users %}
-                    <div>{{ user.username }}</div>
+                    <div>{{ user.nombre }} {{ user.apellido }}</div>
                 {% endfor %}
             </div>
 
@@ -19,6 +23,48 @@
         <hr>
 
     {% endfor %}
+
+    <!-- Dialogs -->
+    <div id="grupoDialog" title="Crear grupo" class="panel panel-default" style="padding: 10px; margin-bottom: 10px;">
+
+        <div class="panel-body">
+
+            <div class="form-group">
+                <form>
+
+                    <div class="form-group">
+                        <label for="name">Nombre del Grupo:</label>
+                        <div style="float:left; width:95%;">
+                            <input type="text" class="form-control" id="name" name="name" placeholder="Ingrese un nombre para el grupo">
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="form-group">
+                        <label>Usuarios seleccionados:</label>
+                        <div id="seleccionados"></div>
+                    </div>
+
+                    <hr>
+
+                    <label>Agregar usuarios:</label>
+                    <div id="usuarios-disponibles" style="height: 90%; width: 100%; overflow-y: scroll; overflow-x: hidden; ">
+                        {% for usuario in usuarios %}
+                            <button id="{{ usuario.id }}" class="usuario btn btn-default" type="button" style="width: 90% !important;" value="{{ usuario.nombre }} {{ usuario.apellido }}"> {{ usuario.nombre }} {{ usuario.apellido }} </button>
+                        {% endfor %}
+                    </div>
+
+                    <hr>
+
+                    <button id="confirmarGrupo" class="btn btn-default pull-right" type="button">Crear Grupo</button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
 
 {% endblock body_container_main %}
 
@@ -41,6 +87,74 @@
             });
 
         })
+
+    </script>
+
+    <!-- script de grupos -->
+    <script type="text/javascript">
+
+        $('#crearGrupo').click(function() {
+            $('#grupoDialog').dialog('open');
+        });
+
+        $(".usuario").click(function(e){
+            e.preventDefault();
+            $(this).addClass('hide');
+            var usuarioTemplate = '<button value="'+this.value+'" type="button" id="'+this.id+'" class="usuario-agregado btn btn-default" style="width: 90% !important;">'+this.value+'</button>';
+            $("#seleccionados").append(usuarioTemplate);
+        });
+
+        $(document).on('click', '.usuario-agregado', function(){
+            $("#usuarios-disponibles").find("button[value='"+this.value+"']").removeClass('hide');
+            $(this).remove();
+        });
+
+        $('#confirmarGrupo').click(function(e) {
+
+            e.preventDefault();
+
+            app.showLoading("Creando grupo");
+
+            var nombreGrupo = $("#name").val();
+            var usuarios = [];
+            $("#seleccionados button").each(
+                    function(){
+                        usuarios.push(this.id);
+                    }
+            );
+
+            $.ajax({
+                type: "POST",
+                data: {
+                    nombreGrupo: nombreGrupo,
+                    usuarios: usuarios
+                },
+                url: '{{ path('createGroup') }}'
+            }).success(function(data, textStatus, jqXHR){
+                window.location.href = '{{ path('myGroups') }}';
+                //app.hideLoading();
+            });
+
+        });
+
+
+        $("#grupoDialog").dialog({
+
+            autoOpen: false,
+            draggable: true,
+            resizable: false,
+            width: 500,
+
+            show: {
+                effect: "clip",
+                duration: 500,
+            },
+
+            hide: {
+                effect: "clip",
+                duration: 500
+            }
+        });
 
     </script>
 

@@ -75,13 +75,30 @@ class RecetasController extends BasicController{
         $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($this->getUser());
         $receta = $this->getDoctrine()->getRepository('AppBundle:Receta')->find($id);
 
+        $ingredientes = $receta->getIdingrediente()->getValues();
+        $condimentos = $receta->getIdcondimento()->getValues();
+
         $arrayReceta = array();
 
+        $arrayReceta["id"] = $receta->getId();
         $arrayReceta["nombre"] = $receta->getNombre();
         $arrayReceta["temporada"] = $receta->getTemporada()->getNombre();
-        $arrayReceta["dificultad"] = $receta->getDificultad();
-        $arrayReceta["calorias"] = "muchas";
+        $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
+        $arrayReceta["calorias"] = $this->calcularCalorias($receta);
         $arrayReceta["calificacion"] = $receta->getCalificacion();
+        $arrayReceta["owner"] = $receta->getIdUsuario();
+        $arrayReceta["ingredientes"] = array();
+        $arrayReceta["condimentos"] = array();
+
+        foreach ($ingredientes as $i) {
+            $intermedia = $this->getDoctrine()->getRepository("AppBundle:IngredienteReceta")->findOneBy(array("idreceta" => $receta, "idingrediente" => $ingredientes));
+            $cantidad = $intermedia->getCantidad();
+            $arrayReceta["ingredientes"][] = array("nombre" => $i->getNombre(), "cantidad" => $cantidad, "unidad" => $i->getUnidad());
+        }
+
+        foreach ($condimentos as $c) {
+            $arrayReceta["condimentos"][] = $c->getNombre();
+        }
 
         $arrayReceta["paso1"] = $receta->getPaso1();
         $arrayReceta["paso2"] = $receta->getPaso2();
@@ -218,6 +235,7 @@ class RecetasController extends BasicController{
     	$ingredientes = $request->request->get("ingredientes");
     	$grupoAlimenticio = $request->request->get("grupoAlimenticio");
         $clasificaciones = $request->request->get("clasificaciones");
+        $condimentos = $request->request->get("condimentos");
 
         $foto1 = $request->request->get("foto1");
         $foto2 = $request->request->get("foto2");
@@ -380,7 +398,34 @@ class RecetasController extends BasicController{
 
     }
 
-    // ------------------ PRIVATE --------------------
+    /**
+     * @Route("/calificarReceta", name="calificarReceta")
+     */
+    public function calificarRecetaAction(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+
+        $id_receta = $request->request->get('id');
+        $puntaje = $request->request->get('puntaje');
+
+        $receta = $this->getDoctrine()->getRepository("AppBundle:Receta")->find($id_receta);
+
+        $calif_vieja = $receta->getCalificacion();
+        $calif_nueva = ($calif_vieja + $puntaje) / 2;
+
+        $receta->setCalificacion(ceil($calif_nueva));
+
+        $historial = new Historial($this->getUser(), $receta, 2);
+
+        $em->persist($receta);
+        $em->persist($historial);
+        $em->flush();
+
+        return new Response("");
+
+    }
+
+        // ------------------ PRIVATE --------------------
 
     private function calcularCalorias(Receta $receta) {
 

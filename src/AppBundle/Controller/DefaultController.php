@@ -58,13 +58,6 @@ class DefaultController extends Controller
             $data['ranking'][] = $arrayReceta;
         }
 
-        // usuarios para crear grupo
-        $data['usuarios'] = $this->getDoctrine()->getRepository("AppBundle:Usuario")->findAll();
-
-        //saca al user logueado
-        if(($key = array_search($id, $data['usuarios'])) !== false) {
-            unset($data['usuarios'][$key]);
-        }
 
     	return $this->render('default/index.html.twig', array("data" => $data));
     }    

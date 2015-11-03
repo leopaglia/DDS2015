@@ -29,8 +29,6 @@ class UserController extends BasicController{
 
         $data['title'] = "Mis recetas";
 
-
-
         return $this->render("default/misRecetas.html.twig", $data);
     }
 
@@ -39,8 +37,16 @@ class UserController extends BasicController{
      */
     public function mostrarGruposAction(){
 
-        $dni = $this->getUser();
-        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($dni);
+        $id = $this->getUser();
+        $user = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find($id);
+
+        // usuarios para crear grupo
+        $data['usuarios'] = $this->getDoctrine()->getRepository("AppBundle:Usuario")->findAll();
+
+        //saca al user logueado
+        if(($key = array_search($id, $data['usuarios'])) !== false) {
+            unset($data['usuarios'][$key]);
+        }
 
         $grupos = $user->getIdgrupo()->getValues();
 
@@ -313,18 +319,18 @@ class UserController extends BasicController{
         $userRepo = $this->getDoctrine()->getRepository('AppBundle:Usuario');
         $em = $this->getDoctrine()->getManager();
 
-        $dni = $this->getUser();
+        $id = $this->getUser();
 
-        $dniArray = $request->request->get("usuarios");
-        $dniArray[] = $dni; //agrega al user logueado
+        $idArray = $request->request->get("usuarios");
+        $idArray[] = $id; //agrega al user logueado
 
         $nombreGrupo = $request->request->get("nombreGrupo");
 
         $grupo = new Grupo();
         $grupo->setNombre($nombreGrupo);
 
-        foreach ($dniArray as $d){
-            $user = $userRepo->find($d);
+        foreach ($idArray as $id){
+            $user = $userRepo->find($id);
             $grupo->addIdusuario($user);
             $user->addIdgrupo($grupo);
         };

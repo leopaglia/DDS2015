@@ -1,110 +1,162 @@
 {% extends "base.html.twig" %}
 
 {% block body_container_main %}
-	<form class="form-horizontal" role="form">
 
-		<div class="panel panel-primary">
-		
-			<div class="panel-heading"></div>
-			
-			<div class="panel-body">
-                <i><b><h3 style="color: #637CBA;">{{ nombre }}</h3></b></i>
+    <div class="panel panel-primary">
 
-                <div id="pasosWrapper" style="margin: 0 auto;">
+        <div class="panel-heading"></div>
 
-                    <div id="paso1wrap" style="clear:both">
-                        <div style="float:left; width:50%;">
-                            {% if paso1 is not null %}
-                                <p>{{ paso1 }}</p>
-                            {% endif %}
-                        </div>
+        <div class="panel-body">
+            <i><b><h3 style="color: #637CBA;">{{ nombre }}</h3></b></i>
+            por {{ owner.nombre }} {{ owner.apellido }}.
 
-                        <div style="float:right; width:50%;">
-                            {% if foto1 is not null %}
-                                <img src={{ foto1 }} height="300" width="400">
-                            {% endif %}
-                        </div>
+            <div class="pull-right" style="display: inline-block; border: solid 1px red; border-radius: 4px; padding: 4px;"> Califica esta receta:
+                <div style="display: inline-block;" id="calif"></div>
+            </div>
+
+            <hr>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Detalles</div>
+                <div class="panel-body">
+
+                    <div style="float:left; width:50%;">
+
+                        Temporada: {{ temporada }}
+
+                        <hr>
+
+                        Dificultad: {{ dificultad }}
+
+                        <hr>
+
+                        <div style="display: inline-block;"> Calificacion: <div class="stars" style="display: inline-block;" title="{{ calificacion }}"></div> </div>
+
+                        <hr>
+
                     </div>
 
-                    <div id="paso2wrap" style="clear:both">
+                    <div style="float:right; width:50%;">
+
+                        Calorías: {{ calorias }}
+
+                        <hr>
+
                         <div style="float:left; width:50%;">
-                            {% if foto2 is not null %}
-                                <img src={{ foto2 }} height="300" width="400">
-                            {% endif %}
+
+                            Ingredientes:
+                            <ul>
+                                {% for i in ingredientes %}
+                                    <li>{{ i.nombre }} : {{ i.cantidad }} {{ i.unidad }}.</li>
+                                {% endfor %}
+                            </ul>
+
                         </div>
 
                         <div style="float:right; width:50%;">
-                            {% if paso2 is not null %}
-                                <p>{{ paso2 }}</p>
+                            {% if condimentos %}
+                            Condimentos:
+                            <ul>
+                                {% for c in condimentos %}
+                                    <li>{{ c }}</li>
+                                {% endfor %}
+                            </ul>
                             {% endif %}
                         </div>
+
+
                     </div>
 
-                    <div id="paso3wrap" style="clear:both">
-                        <div style="float:left; width:50%;">
-                            {% if paso3 is not null %}
-                                <p>{{ paso3 }}</p>
-                            {% endif %}
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">Pasos</div>
+                <div class="panel-body">
+
+                    <div id="pasosWrapper" style="margin: 0 auto;">
+
+                        <div id="paso1wrap" style="clear:both">
+                            <div style="float:left; width:50%;">
+                                {% if paso1 %}
+                                    <p>{{ paso1 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div style="float:right; width:50%;">
+                                {% if foto1 %}
+                                    <img src={{ foto1 }} height="300" width="400">
+                                {% endif %}
+                            </div>
                         </div>
 
-                        <div style="float:right; width:50%;">
-                            {% if foto3 is not null %}
-                                <img src={{ foto3 }} height="300" width="400">
-                            {% endif %}
-                        </div>
-                    </div>
+                        <div id="paso2wrap" style="clear:both">
+                            <div style="float:left; width:50%;">
+                                {% if foto2 %}
+                                    <img src={{ foto2 }} height="300" width="400">
+                                {% endif %}
+                            </div>
 
-                    <div id="paso4wrap" style="clear:both">
-                        <div style="float:left; width:50%;">
-                            {% if foto4 is not null %}
-                                <img src={{ foto4 }} height="300" width="400">
-                            {% endif %}
-                        </div>
-
-                        <div style="float:right; width:50%;">
-                            {% if paso4 is not null %}
-                                <p>{{ paso4 }}</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div id="paso5wrap" style="clear:both">
-                        <div style="float:left; width:50%;">
-                            {% if paso5 is not null %}
-                            <p><p>{{ paso5 }}</p>
-                            </p>
-                        {% endif %}
+                            <div style="float:right; width:50%;">
+                                {% if paso2 %}
+                                    <p>{{ paso2 }}</p>
+                                {% endif %}
+                            </div>
                         </div>
 
-                        <div style="float:right; width:50%;">
-                            {% if foto5 is not null %}
-                                <img src={{ foto5 }} height="300" width="400">
-                            {% endif %}
+                        <div id="paso3wrap" style="clear:both">
+                            <div style="float:left; width:50%;">
+                                {% if paso3 %}
+                                    <p>{{ paso3 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div style="float:right; width:50%;">
+                                {% if foto3 %}
+                                    <img src={{ foto3 }} height="300" width="400">
+                                {% endif %}
+                            </div>
                         </div>
+
+                        <div id="paso4wrap" style="clear:both">
+                            <div style="float:left; width:50%;">
+                                {% if foto4 %}
+                                    <img src={{ foto4 }} height="300" width="400">
+                                {% endif %}
+                            </div>
+
+                            <div style="float:right; width:50%;">
+                                {% if paso4 %}
+                                    <p>{{ paso4 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div id="paso5wrap" style="clear:both">
+                            <div style="float:left; width:50%;">
+                                {% if paso5 %}
+                                <p><p>{{ paso5 }}</p>
+                                </p>
+                            {% endif %}
+                            </div>
+
+                            <div style="float:right; width:50%;">
+                                {% if foto5 %}
+                                    <img src={{ foto5 }} height="300" width="400">
+                                {% endif %}
+                            </div>
+                        </div>
+
                     </div>
 
                 </div>
 
             </div>
-			
-		</div>
-		
-		<div class="panel panel-primary" style="width:50%;">
-			<div class="panel-body">
-				<div style="float:left; width:50%;">
-					Calificar esta receta
-				</div>
-				<div style="float:right; width:50%;">
-					<input name='star' type='radio'class='star'>
-					<input name='star' type='radio'class='star'>
-					<input name='star' type='radio'class='star'>
-					<input name='star' type='radio'class='star'>
-					<input name='star' type='radio'class='star'>
-				</div>
-			</div>
-		</div>	
 
-	</form>
+        </div>
+
+    </div>
+
 
 {% endblock body_container_main%}	
 
@@ -115,8 +167,26 @@
     <script type="text/javascript">
     	
 		$(document).ready(function() {
-	    
-	   		$(".star").rating();
+
+            $('.stars').each(function(){
+                var cant = this.title;
+                $(this).raty({ readOnly: true, score: cant });
+            })
+
+            $('#calif').raty({
+                click: function(score, evt) {
+
+                    $.ajax({
+                        type: 'POST',
+                        data:{
+                            'id' : {{ id }},
+                            'puntaje' : score
+                        },
+                        url: "{{ path('calificarReceta') }}"
+                    })
+
+                }
+            });
 	
 		});
 

@@ -294,12 +294,12 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
             return $qb;
 
 
-        //ultimas 10 recetas calificadas //TODO
+        //ultimas 10 recetas calificadas
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb ->select("r")
             ->from("AppBundle:Historial", "h")
             ->innerJoin("AppBundle:Receta", "r", 'WITH', 'h.idreceta = r.id')
-            ->where('h.aceptada = 1')
+            ->where('h.aceptada = 2')
             ->andWhere('h.idusuario = :id')
             ->setParameter("id", $user->getId())
             ->orderBy("h.fecha")

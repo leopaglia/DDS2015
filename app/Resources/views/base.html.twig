@@ -71,8 +71,7 @@
                                         <ul class="dropdown-menu">
                                             <li><a href="{{ path('modifyProfile') }}"> Modificar perfil </a></li>
                                             <li role="separator" class="divider"></li>
-                                            <li><a href="{{ path('myGroups') }}"> Mis recetas </a></li>
-                                            <li><a href="#" id="crearGrupo"> Crear nuevo grupo </a></li>
+                                            <li><a href="{{ path('myGroups') }}"> Mis grupos </a></li>
                                         </ul>
                                     </li>
 
@@ -131,71 +130,6 @@
 
                     window.app.init("{{ asset("") }}");
 
-                });
-
-            </script>
-
-            <!-- script de grupos -->
-            <script type="text/javascript">
-
-                $('#crearGrupo').click(function() {
-                    $('#grupoDialog').dialog('open');
-                });
-
-                $(".usuario").click(function(e){
-                    e.preventDefault();
-                    $(this).addClass('hide');
-                    var usuarioTemplate = '<button value="'+this.value+'" type="button" id="'+this.id+'" class="usuario-agregado btn btn-default" style="width: 90% !important;">'+this.value+'</button>';
-                    $("#seleccionados").append(usuarioTemplate);
-                });
-
-                $(document).on('click', '.usuario-agregado', function(){
-                    $("#usuarios-disponibles").find("button[value='"+this.value+"']").removeClass('hide');
-                    $(this).remove();
-                });
-
-                $('#confirmarGrupo').click(function(e) {
-
-                    e.preventDefault();
-
-                    var nombreGrupo = $("#name").val();
-                    var usuarios = [];
-                    $("#seleccionados button").each(
-                            function(){
-                                usuarios.push(this.id);
-                            }
-                    );
-
-                    $.ajax({
-                        type: "POST",
-                        data: {
-                            nombreGrupo: nombreGrupo,
-                            usuarios: usuarios
-                        },
-                        {#url: '{{ urlCrearGrupo }}'#}
-                    }).success(function(data, textStatus, jqXHR){
-                        alert('Grupo creado');
-                    });
-
-                });
-
-
-                $("#grupoDialog").dialog({
-
-                    autoOpen: false,
-                    draggable: true,
-                    resizable: false,
-                    width: 500,
-
-                    show: {
-                        effect: "clip",
-                        duration: 500,
-                    },
-
-                    hide: {
-                        effect: "clip",
-                        duration: 500
-                    }
                 });
 
             </script>
