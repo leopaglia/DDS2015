@@ -197,12 +197,43 @@
     {{ parent() }}
     
     <script type="text/javascript">
-    	
-		$(document).ready(function() {
+
+        $(document).ready(function() {
 
             $(document).on('click', '.ingrediente-agregado', function(){
                 $("#ingredientesDisponibles").find("button[value='"+this.value+"']").removeClass('hide');
                 $(this).parent().remove();
+            });
+
+            $("#ingrediente-input").on("input", function() {
+
+                // guardo el texto buscado
+                var text = $(this).val();
+
+                $(".ingrediente").each(function(){
+
+                    var ing_name = $(this).val();
+
+                    //saco todos los hide
+                    $(this).removeClass('hide');
+
+                    //si el nombre del ingrediente no empieza (o es) como el texto buscado, lo oculto
+                    if (ing_name.substring(0, text.length) != text) $(this).addClass('hide');
+
+                    //si ya esta agregado como ingrediente, lo oculto
+                    var ing_agregado = $('#ingrediente-container').find('button[value="'+ing_name+'"]');
+                    if( ing_agregado.length !== 0 ) $(this).addClass('hide');
+
+                })
+
+            });
+
+            //cancelo el enter
+            $(document).on("keypress", function(e) {
+                if(e.which == 13) {
+                    e.preventDefault();
+                    return false;
+                }
             });
 
             $(".ingrediente").click(function(e){

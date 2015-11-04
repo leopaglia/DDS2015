@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Constants\SexosConstants;
 use Proxies\__CG__\AppBundle\Entity\Grupo;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -89,6 +90,10 @@ class UserController extends BasicController{
         $arrayDietas = array();
         $arrayGruposAlimenticios = array();
 
+        $arraySexos = array();
+        $arraySexos[] = array("name" => 'Masculino', "value" => SexosConstants::MASCULIMO);
+        $arraySexos[] = array("name" => 'Femenino', "value" => SexosConstants::FEMENINO);
+
         foreach ($complexiones as $c){
             $arrayComplexiones[] = array("name" => $c->getNombre(), "value" => $c->getId());
         }
@@ -145,6 +150,7 @@ class UserController extends BasicController{
         $nombre = '';
         $apellido = '';
         $edad = '';
+        $sexo = '';
         $altura = '';
         $rutina_id = '';
         $complexion_id  = '';
@@ -158,6 +164,9 @@ class UserController extends BasicController{
 
         if ($user->getEdad())
             $edad = $user->getEdad();
+
+        if ($user->getSexo())
+            $sexo = $user->getSexo();
 
         if ($user->getAltura())
             $altura = $user->getAltura();
@@ -180,6 +189,7 @@ class UserController extends BasicController{
      					array("label" => "Nombre", "type" => "input", "idName" => "nombre", "placeholder" => "Ingrese su Nombre", "value" => $nombre),
      					array("label" => "Apellido", "type" => "input", "idName" => "apellido", "placeholder" => "Ingrese su Apellido", "value" => $apellido),
      					array("label" => "Edad", "type" => "input", "idName" => "edad", "placeholder" => "Ingrese su Edad", "value" => $edad),
+                        array("label" => "Sexo", "type" => "select", "idName" => "sexo", "options" => $arraySexos, "value" => $sexo),
      					array("label" => "Altura", "type" => "input", "idName" => "altura", "placeholder" => "Ingrese su Altura (en centimetros)", "value" => $altura),
                         array("label" => "Complexion", "type" => "select", "idName" => "complexion", "options" => $arrayComplexiones, "value" => $complexion_id),
      			)),
@@ -231,6 +241,7 @@ class UserController extends BasicController{
     	$apellido = $request->request->get("apellido");
     	$edad = $request->request->get("edad");
     	$altura = $request->request->get("altura");
+        $sexo = $request->request->get("sexo");
     	$rutina = $request->request->get("rutina");
         $dieta = $request->request->get("dieta");
     	$complexion = $request->request->get("complexion");
@@ -251,6 +262,8 @@ class UserController extends BasicController{
 	    		$user->setEdad($edad);
     		if(!empty($altura))
 	    		$user->setAltura($altura);
+            if(!empty($sexo))
+                $user->setSexo($sexo);
     		if(!empty($rutina))
 	    		$user->setRutina($this->getDoctrine()->getRepository("AppBundle:Rutina")->find($rutina));
             if(!empty($dieta))
