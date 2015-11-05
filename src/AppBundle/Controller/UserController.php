@@ -20,6 +20,8 @@ use AppBundle\Repository\GenericRepository as GenericRepository;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\DateTime;
 
+use AppBundle\Constants;
+
 class UserController extends BasicController{
 
 
@@ -46,6 +48,13 @@ class UserController extends BasicController{
 
         //saca al user logueado
         if(($key = array_search($id, $data['usuarios'])) !== false) {
+            unset($data['usuarios'][$key]);
+        }
+
+        $userSistema = $this->getDoctrine()->getRepository('AppBundle:Usuario')->find(Constants\ConfigConstants::SISTEMA_ID);
+
+        //saca al sistema
+        if(($key = array_search($userSistema, $data['usuarios'])) !== false) {
             unset($data['usuarios'][$key]);
         }
 

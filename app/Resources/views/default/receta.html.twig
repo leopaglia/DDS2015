@@ -74,100 +74,101 @@
                 <div class="panel-heading">Pasos</div>
                 <div class="panel-body">
 
-
-                    <div class="panel panel-default" style="clear:both">
-                        <div class="panel-heading"><b>Paso 1</b></div>
-                        <div class="panel-body">
-                            <div class="pull-left" style="width:50%;">
-                                {% if paso1 %}
+                    {% if paso1 %}
+                        <div class="panel panel-default" style="clear:both">
+                            <div class="panel-heading"><b>Paso 1</b></div>
+                            <div class="panel-body">
+                                <div class="pull-left" style="width:50%;">
                                     <p>{{ paso1 }}</p>
-                                {% endif %}
-                            </div>
+                                </div>
 
-                            <div class="pull-right" style="width:50%;">
-                                {% if foto1 %}
-                                    <img src={{ foto1 }} height="300" width="400">
-                                {% endif %}
+                                <div class="pull-right" style="width:50%;">
+                                    {% if foto1 %}
+                                        <img class="pull-right" src={{ foto1 }} height="300" width="400">
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr>
+                        <hr>
+                    {% endif %}
 
-                    <div class="panel panel-default" style="clear:both">
-                        <div class="panel-heading"><b>Paso 2</b></div>
-                        <div class="panel-body">
-                            <div class="pull-left" style="width:50%;">
-                                {% if foto2 %}
-                                    <img src={{ foto2 }} height="300" width="400">
-                                {% endif %}
-                            </div>
 
-                            <div class="pull-right" style="width:50%;">
-                                {% if paso2 %}
+                    {% if paso2 %}
+                        <div class="panel panel-default" style="clear:both">
+                            <div class="panel-heading"><b>Paso 2</b></div>
+                            <div class="panel-body">
+                                <div class="pull-left" style="width:50%;">
+                                    {% if foto2 %}
+                                        <img src={{ foto2 }} height="300" width="400">
+                                    {% endif %}
+                                </div>
+
+                                <div class="pull-right" style="width:50%;">
                                     <p>{{ paso2 }}</p>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr>
+                        <hr>
+                    {% endif %}
 
-                    <div class="panel panel-default" style="clear:both">
-                        <div class="panel-heading"><b>Paso 3</b></div>
-                        <div class="panel-body">
-                            <div class="pull-left" style="width:50%;">
-                                {% if paso3 %}
+
+                    {% if paso3 %}
+                        <div class="panel panel-default" style="clear:both">
+                            <div class="panel-heading"><b>Paso 3</b></div>
+                            <div class="panel-body">
+                                <div class="pull-left" style="width:50%;">
                                     <p>{{ paso3 }}</p>
-                                {% endif %}
-                            </div>
+                                </div>
 
-                            <div class="pull-right" style="width:50%;">
-                                {% if foto3 %}
-                                    <img src={{ foto3 }} height="300" width="400">
-                                {% endif %}
+                                <div class="pull-right" style="width:50%;">
+                                    {% if foto3 %}
+                                        <img class="pull-right" src={{ foto3 }} height="300" width="400">
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr>
+                        <hr>
+                    {% endif %}
 
-                    <div class="panel panel-default" style="clear:both">
-                        <div class="panel-heading"><b>Paso 4</b></div>
-                        <div class="panel-body">
-                            <div class="pull-left" style="width:50%;">
-                                {% if foto4 %}
-                                    <img src={{ foto4 }} height="300" width="400">
-                                {% endif %}
-                            </div>
 
-                            <div class="pull-right" style="width:50%;">
-                                {% if paso4 %}
+                    {% if paso4 %}
+                        <div class="panel panel-default" style="clear:both">
+                            <div class="panel-heading"><b>Paso 4</b></div>
+                            <div class="panel-body">
+                                <div class="pull-left" style="width:50%;">
+                                    {% if foto4 %}
+                                        <img src={{ foto4 }} height="300" width="400">
+                                    {% endif %}
+                                </div>
+
+                                <div class="pull-right" style="width:50%;">
                                     <p>{{ paso4 }}</p>
-                                {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <hr>
+                        <hr>
+                    {% endif %}
 
-                    <div class="panel panel-default" style="clear:both">
-                        <div class="panel-heading"><b>Paso 5</b></div>
-                        <div class="panel-body">
-                            <div class="pull-left" style="width:50%;">
-                                {% if paso5 %}
-                                <p><p>{{ paso5 }}</p>
-                                </p>
-                            {% endif %}
-                            </div>
+                    {% if paso5 %}
+                        <div class="panel panel-default" style="clear:both">
+                            <div class="panel-heading"><b>Paso 5</b></div>
+                            <div class="panel-body">
+                                <div class="pull-left" style="width:50%;">
+                                    <p>{{ paso5 }}</p>
+                                </div>
 
-                            <div class="pull-right" style="width:50%;">
-                                {% if foto5 %}
-                                    <img src={{ foto5 }} height="300" width="400">
-                                {% endif %}
+                                <div class="pull-right" style="width:50%;">
+                                    {% if foto5 %}
+                                        <img class="pull-right" src={{ foto5 }} height="300" width="400">
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
 
 
                 </div>

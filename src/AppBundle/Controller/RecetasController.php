@@ -489,8 +489,9 @@ class RecetasController extends BasicController{
         $i = 0;
         foreach ($recetas as $r){
 
-            if ( ! in_array($r->getIdUsuario()->getId(), $usersIdDeMisGrupos) )
+            if ( ! in_array($r->getIdUsuario()->getId(), $usersIdDeMisGrupos) ){
                 unset($recetas[$i]);
+            }
 
             $i++;
         }

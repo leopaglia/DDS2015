@@ -34,7 +34,7 @@
 
                 <div class="pull-right">
                     {% if app.user %}
-                        <p>{% if app.user.sexo == 2 %}Bienvenida{% else %}Bienvenido{% endif %}, <b>{{ app.user.username }}</b>!</p>
+                        <p>Bienvenid@, <b>{{ app.user.username }}</b>!</p>
                         <p class="pull-right"><a href="{{ path('fos_user_security_logout') }}">Cerrar sesión</a></p>
                     {% else %}
                         <a href="{{ path('fos_user_security_login') }}"><button type="button" class="btn btn-lg btn-default">Ingresar</button></a>

@@ -69,7 +69,18 @@
                     misRecetasTable.clear();
                     misRecetasTable.rows.add(data).draw();
 
+                    $('.rat').each(function(){
+                        var cant = this.title;
+                        $(this).raty({ readOnly: true, score: cant });
+                    })
+
                 });
+
+            }
+
+            var printStars = function(cant){
+
+                return '<div class="rat" title="'+cant+'"></div>';
 
             }
 
@@ -81,8 +92,7 @@
                     { "data": "temporada" },
                     { "data": "dificultad" },
                     { "data": "calorias" },
-// 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
-                    { "data": "calificacion"}, //hasta arreglar el plugin
+                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
                     { "data": null, "render": function ( data, type, full, meta ) {return app.createIcon(app.icons.DELETE, "Eliminar")} }
 
                 ]

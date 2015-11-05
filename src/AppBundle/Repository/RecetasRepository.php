@@ -183,15 +183,6 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
         }
 
-        if ($this->validFilter($filtros['clasificacion'])){ //FIXME
-
-            //$qb->innerJoin("r.idClasificacion c ON c.id = r.idClasificacion");
-
-            //$qb ->andWhere($qb->expr()->eq("r.idClasificacion", ":idClasificacion"))
-            //    ->setParameter("idClasificacion", $filtros['clasificacion']);
-
-        }
-
         if ($this->validFilter($filtros['grupoAlimenticio'])){
 
             $qb ->andWhere($qb->expr()->eq("r.grupoAlim", ":grupoAlim"))
