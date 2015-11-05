@@ -15,6 +15,8 @@ use AppBundle\Entity\Receta;
 use AppBundle\Entity\Historial;
 use AppBundle\Entity\IngredienteReceta;
 
+use AppBundle\Constants\ConfigConstants;
+
 class RecetasController extends BasicController{
 
     // ------------ RENDERS ------------
@@ -148,6 +150,9 @@ class RecetasController extends BasicController{
         if ($filtros['owner'] == 'me') $acceptVisitors = false; //si busco mis recetas, que no las filtre
 
     	$recetas = $this->getDoctrine()->getRepository('AppBundle:Receta')->getRecetasByFilters($filtros, $user, $acceptVisitors);
+
+        // saco las recetas que no son mias, de mis grupos o del sistema
+        $recetas = $this->sacarRecetasExternas($recetas);
     	
 		$arrayRecetas = array();
 
@@ -168,6 +173,7 @@ class RecetasController extends BasicController{
                 $arrayReceta["dificultad"] = $receta->getDificultad()->getDescripcion();
                 $arrayReceta["calorias"] = $this->calcularCalorias($receta);
                 $arrayReceta["calificacion"] = $receta->getCalificacion();
+                $arrayReceta["check"] = $this->shouldCheck($receta);
 
                 $arrayRecetas[] = $arrayReceta;
             }
@@ -459,6 +465,61 @@ class RecetasController extends BasicController{
             return ($this->calcularCalorias($receta) > $caloriasDesde);
 
         return ($this->calcularCalorias($receta) > $caloriasDesde) && ($this->calcularCalorias($receta) < $caloriasHasta);
+    }
+
+    private function sacarRecetasExternas($recetas) {
+
+        $idUsuario = $this->getUser();
+        $user = $this->getDoctrine()->getRepository("AppBundle:Usuario")->find($idUsuario);
+
+        $grupos = $user->getIdgrupo()->getValues();
+
+        $usersIdDeMisGrupos = array();
+        $usersIdDeMisGrupos[] = ConfigConstants::SISTEMA_ID;
+
+        foreach ($grupos as $g){
+
+            $users = $g->getIdusuario()->getValues();
+
+            foreach ($users as $u)
+                if ( ! in_array($u->getId(), $usersIdDeMisGrupos) ) $usersIdDeMisGrupos[] = $u->getId();
+
+        }
+
+        $i = 0;
+        foreach ($recetas as $r){
+
+            if ( ! in_array($r->getIdUsuario()->getId(), $usersIdDeMisGrupos) )
+                unset($recetas[$i]);
+
+            $i++;
+        }
+
+        return $recetas;
+
+    }
+
+    private function shouldCheck(Receta $receta){
+
+        //si es del user logueado
+        if ($receta->getIdUsuario() == $this->getUser())
+            return true;
+
+        $aceptada = $this->getDoctrine()->getRepository("AppBundle:Historial")->findBy(
+            array(
+                "idusuario" => $this->getUser(),
+                "idreceta" => $receta->getId(),
+                "aceptada" => 1
+            )
+        );
+
+        // si ya fue aceptada
+        if(!empty($aceptada))
+            return true;
+
+        return false;
+
+
     }
 
 }

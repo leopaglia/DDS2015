@@ -167,7 +167,7 @@
                                 url: "{{ data.url.agregarAPerfil }}"
                             }).success(function(data, textStatus, jqXHR){
 
-                                loadingImg.replaceWith('<img src='+checkurl+' />');
+                                loadingImg.replaceWith('<img src='+checkurl+' width="24" height="24" class="zoomIt"/>');
 
                             });
 
@@ -185,7 +185,14 @@
 					                    { "data": "dificultad" },
 					                    { "data": "calorias" },
 					                    { "data": "calificacion", "render": function ( data, type, full, meta ) {return printStars(data)}},
-					                    { "data": null, "render": function ( data, type, full, meta ) {return app.createIcon("add", "Agregar al Perfil")} }
+					                    { "data": null, "render": function ( data, type, full, meta ) {
+                                                if(full.check){
+                                                    return app.createIcon("check", "")
+                                                }else{
+                                                    return app.createIcon("add", "Agregar al Perfil")
+                                                }
+                                            }
+                                        }
 
 					                ],
                             "drawCallback": function(settings, json) {

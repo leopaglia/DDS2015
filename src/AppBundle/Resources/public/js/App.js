@@ -27,6 +27,7 @@ App.prototype = {
     //constantes icons
     icons: {
         ADD: "add",
+        CHECK: "check",
         DELETE: "delete",
         EDIT: "edit",
         DETAIL: "detail"
@@ -70,6 +71,9 @@ App.prototype = {
         }
         if (name === this.icons.DELETE) {
             img.src = this.root + "bundles/app/img/delete.png";
+        }
+        if (name === this.icons.CHECK) {
+            img.src = this.root + "bundles/app/img/check_on.png";
         }
 
         img.alt = title;

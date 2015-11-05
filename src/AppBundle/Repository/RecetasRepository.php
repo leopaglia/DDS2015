@@ -208,6 +208,7 @@ class RecetasRepository extends EntityRepository implements IVisitableRepository
 
         }
 
+
         if($ignoreUser){
 
             $arrayRecetas = $this->user->getIdreceta()->toArray();
